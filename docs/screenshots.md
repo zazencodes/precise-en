@@ -1,8 +1,17 @@
 # Screenshots
 
-The README shows two images, `docs/assets/mac.png` and `docs/assets/iphone.png`. They are taken from the real apps running against a local copy of your word list, so nothing on your live list is rated, opened or changed.
+Every screenshot lives in `docs/assets/screenshots/`: six single screens, and the two images the README shows, `mac.png` and `iphone.png`, which combine them. They are taken from the real apps running against a local copy of your word list, so nothing on your live list is rated, opened or changed.
 
-`mac.png` shows the Mac window with a card, then the same card with its answer. `iphone.png` shows the iPhone's Review, the answer, Words and Stats.
+| File | Shows |
+|---|---|
+| `mac-review.png` | The Mac window with a card |
+| `mac-review-answer.png` | The same card with its answer |
+| `iphone-review.png` | The iPhone's Review |
+| `iphone-review-answer.png` | The answer |
+| `iphone-words.png` | Words |
+| `iphone-stats.png` | Stats |
+| `mac.png` | Both Mac screens side by side, for the README |
+| `iphone.png` | All four iPhone screens side by side, for the README |
 
 ## What they may show
 
@@ -63,6 +72,8 @@ The screenshot build shares the installed app's bundle ID, so quit the installed
 
 ```sh
 shots=/tmp/precise-en-shots
+out=docs/assets/screenshots
+mkdir -p $out
 app="$shots/mac/Build/Products/Release/precise::en.app"
 pkill -f "/Applications/precise::en.app/Contents/MacOS"
 open "$app"; sleep 5; open "$app"; sleep 3
@@ -70,10 +81,10 @@ osascript -e 'tell application "System Events" to tell process "precise::en"' \
           -e 'set frontmost to true' -e 'set size of window 1 to {900, 640}' -e 'end tell'
 sleep 1
 window=$(swift docs/screenshots/window-id.swift)
-screencapture -x -o -l $window $shots/mac-review.png
+screencapture -x -o -l $window $out/mac-review.png
 osascript -e 'tell application "System Events" to key code 49'   # Space: Show Answer
 sleep 2
-screencapture -x -o -l $window $shots/mac-review-answer.png
+screencapture -x -o -l $window $out/mac-review-answer.png
 pkill -f "$app/Contents/MacOS"
 open "/Applications/precise::en.app"
 ```
@@ -82,32 +93,34 @@ open "/Applications/precise::en.app"
 
 ```sh
 shots=/tmp/precise-en-shots
+out=docs/assets/screenshots
 app="$shots/ios/Build/Products/Debug-iphonesimulator/Precise EN.app"
 bundle=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$app/Info.plist")
 device=$(xcrun simctl list devices available | grep -m1 "iPhone 17 Pro (" | grep -oE '[0-9A-F-]{36}')
-xcrun simctl boot $device; xcrun simctl bootstatus $device
+xcrun simctl shutdown $device; xcrun simctl boot $device; xcrun simctl bootstatus $device
 xcrun simctl ui $device appearance dark
 xcrun simctl status_bar $device override --time 9:41 --dataNetwork wifi --wifiMode active --wifiBars 3 \
     --cellularMode active --cellularBars 4 --batteryState charging --batteryLevel 100
 xcrun simctl install $device "$app"
+open -a Simulator; sleep 4
 xcrun simctl launch $device $bundle; sleep 8
-xcrun simctl io $device screenshot $shots/iphone-review.png
-open -a Simulator; sleep 2
-osascript -e 'tell application "System Events" to key code 49'   # Space: Show Answer
+xcrun simctl io $device screenshot $out/iphone-review.png
+osascript -e 'tell application "Simulator" to activate' -e 'delay 1' \
+          -e 'tell application "System Events" to key code 49'   # Space: Show Answer
 sleep 2
-xcrun simctl io $device screenshot $shots/iphone-review-answer.png
+xcrun simctl io $device screenshot $out/iphone-review-answer.png
 ```
 
 Click **Words** in the Simulator's tab bar, then:
 
 ```sh
-xcrun simctl io $device screenshot $shots/iphone-words.png
+xcrun simctl io $device screenshot $out/iphone-words.png
 ```
 
 Click **Stats**, then:
 
 ```sh
-xcrun simctl io $device screenshot $shots/iphone-stats.png
+xcrun simctl io $device screenshot $out/iphone-stats.png
 xcrun simctl uninstall $device $bundle
 xcrun simctl status_bar $device clear
 xcrun simctl shutdown $device
@@ -116,9 +129,8 @@ xcrun simctl shutdown $device
 ## 5. Combine and clean up
 
 ```sh
-shots=/tmp/precise-en-shots
-python3 docs/screenshots/compose.py $shots docs/assets
-pngquant --quality 80-95 --speed 1 --force --ext .png docs/assets/mac.png docs/assets/iphone.png
+python3 docs/screenshots/compose.py docs/assets/screenshots
+pngquant --quality 80-95 --speed 1 --force --ext .png docs/assets/screenshots/*.png
 ```
 
 Stop `wrangler dev`, then delete the local copy: it holds every word you saved, with your prompts.

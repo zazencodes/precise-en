@@ -23,13 +23,13 @@ When you send Claude Code or Codex a long prompt, precise//en asks a cheap backg
 ### Mac
 
 <p align="center">
-  <img src="docs/assets/mac.png" alt="The Mac app's Review window twice: a card showing one word set large above Show Answer, then the same card answered, with the definition, the phrase you wrote, the rewrite that uses the word, Archive and the four ratings" width="100%">
+  <img src="docs/assets/screenshots/mac.png" alt="The Mac app's Review window twice: a card showing one word set large above Show Answer, then the same card answered, with the definition, the phrase you wrote, the rewrite that uses the word, Archive and the four ratings" width="100%">
 </p>
 
 ### iPhone
 
 <p align="center">
-  <img src="docs/assets/iphone.png" alt="The iPhone app's Review card, its answer, Words with each word's definition and difficulty, and Stats with words saved, due, learned and known by tier and difficulty" width="100%">
+  <img src="docs/assets/screenshots/iphone.png" alt="The iPhone app's Review card, its answer, Words with each word's definition and difficulty, and Stats with words saved, due, learned and known by tier and difficulty" width="100%">
 </p>
 
 ## Features

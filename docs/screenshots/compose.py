@@ -1,7 +1,7 @@
-"""Combines the raw screenshots into the README's two images: mac.png and iphone.png.
+"""Combines the single screenshots into the README's two images, mac.png and iphone.png, beside them.
 
-Usage: compose.py SHOTS_DIR ASSETS_DIR
-SHOTS_DIR holds mac-review.png, mac-review-answer.png, iphone-review.png,
+Usage: compose.py DIR
+DIR holds mac-review.png, mac-review-answer.png, iphone-review.png,
 iphone-review-answer.png, iphone-words.png and iphone-stats.png.
 """
 import sys
@@ -9,13 +9,13 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-shots, assets = Path(sys.argv[1]), Path(sys.argv[2])
+folder = Path(sys.argv[1])
 WIDTH = 1760  # twice the width of GitHub's README column
 GAP = 48
 
 
 def load(name):
-    return Image.open(shots / name).convert("RGBA")
+    return Image.open(folder / name).convert("RGBA")
 
 
 def rounded(image):
@@ -35,7 +35,7 @@ def row(images, name):
     for image in images:
         canvas.alpha_composite(image, (x, 0))
         x += image.width + GAP
-    canvas.resize((WIDTH, round(height * WIDTH / canvas.width)), Image.LANCZOS).save(assets / name)
+    canvas.resize((WIDTH, round(height * WIDTH / canvas.width)), Image.LANCZOS).save(folder / name)
 
 
 row([load("mac-review.png"), load("mac-review-answer.png")], "mac.png")
