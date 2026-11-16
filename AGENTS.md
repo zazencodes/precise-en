@@ -6,7 +6,7 @@ precise//en: learn the English words you could have used in your own prompts. A 
 
 - `worker/`: the Cloudflare Worker and its D1 database `precise-en`. `src/schedule.ts` is the review schedule, `migrations/` the table.
 - `Sources/PreciseKit`: the word model, the API client and the capture status file, shared by everything below.
-- `Sources/PreciseUI`: SwiftUI shared by both apps: `WordStore`, Review, Words.
+- `Sources/PreciseUI`: SwiftUI shared by both apps: `WordStore`, Review, Words, Stats.
 - `Sources/PreciseCLI`: `precise-en hook` (the UserPromptSubmit hook) and `precise-en suggest` (asks the background agent and saves the word). `Capture.swift` holds the prompt to the background agent and the checks on its answer.
 - `apps/`: `project.yml` (xcodegen) with the Mac app (`Mac/`, a `MenuBarExtra` plus one window) and the iPhone app (`iOS/`), and `icon.swift`, which renders the app icon.
 
@@ -21,13 +21,13 @@ precise//en: learn the English words you could have used in your own prompts. A 
 
 ## Important Details
 
-- The scripts use Xcode through `DEVELOPER_DIR`; `xcode-select` points at the Command Line Tools on this Mac. Set `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` for `swift` and `xcodebuild` yourself.
-- `~/.config/precise-en/config.json` (`url`, `token`, `apple_team_id`, `bundle_id`, mode 600) is the one source of the API URL and token and of the Apple team and bundle ID the apps are signed with. The token is the Worker secret `TOKEN`; never print it or commit it.
+- The scripts use Xcode through `DEVELOPER_DIR`, so they work when `xcode-select` points at the Command Line Tools. Set `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` for `swift` and `xcodebuild` yourself.
+- `~/.config/precise-en/config.json` (`url`, `token`, `apple_team_id`, `bundle_id`, mode 600) is the one source of the API URL and token and of the Apple team and bundle ID the apps are signed with. The token is the Worker secret `TOKEN`; never print it or commit it. Nothing personal goes in a tracked file: no URLs, ids, team IDs or text from real prompts, in code, tests, docs or screenshots.
 - The hook is installed outside this repo, as a `UserPromptSubmit` entry running `~/.local/bin/precise-en hook` in `~/.claude/settings.json` and in `~/.codex/hooks.json`. Codex runs it only once it is trusted in `/hooks`, which records a hash in `~/.codex/config.toml`; editing the entry needs trusting again.
 - The hook must print nothing (Claude Code adds hook output to the conversation) and never exit 2 (that blocks the prompt). Everything `suggest` runs carries `PRECISE_EN_CAPTURE`, and the hook ignores prompts in that environment, so a background agent with hooks of its own cannot feed captures back in.
 - `suggest` appends one line per prompt to `~/.local/state/precise-en/capture.log` and writes the latest result to `last-capture.json`; the Mac app turns its menu bar icon into a warning when that result is `failed`.
-- The Mac app registers itself as a login item only when it runs from `/Applications`. Ice may hide its menu bar item when it first appears.
-- Prompts that an orchestrator agent sends to another agent are captured too; nothing yet tells them apart from Alex's.
+- The Mac app registers itself as a login item only when it runs from `/Applications`. A menu bar manager such as Ice may hide its menu bar item when it first appears.
+- Prompts that an orchestrator agent sends to another agent are captured too; nothing yet tells them apart from the user's own.
 
 ## Decisions
 
@@ -38,6 +38,7 @@ Read these before changing the area they cover, and write a new one whenever a d
 - Cards show the word and ask for its meaning: `docs/adr/2026-11-15-cards-ask-for-the-meaning.md`
 - Known words are archived rather than deleted, and difficulty is judged at capture: `docs/adr/2026-11-15-known-words-are-archived-and-judged-at-capture.md`
 - The Mac app's file name is `precise::en.app`, which Finder shows as precise//en: `docs/adr/2026-11-16-the-mac-app-file-name-spells-the-name-with-colons.md`
+- Each person's URL, token, Apple team and bundle ID live in their own config file, and Wrangler finds the D1 database by name: `docs/adr/2026-11-16-each-persons-own-settings-stay-out-of-the-repo.md`
 
 ## Changelog and Releases
 
@@ -45,4 +46,4 @@ When a change is finished and tested, run `./install.sh` (and `./install-iphone.
 
 Add an entry to `CHANGELOG.md` (Keep a Changelog) under `## [Unreleased]` for every user-facing change, in the subsections `### Breaking Changes`, `### Added`, `### Changed`, `### Fixed`, `### Removed`: one line, past tense, saying what changed for the user. Released sections are immutable.
 
-To release from a clean, pushed `main`: rename `[Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` with a fresh `## [Unreleased]` above it, set `MARKETING_VERSION` in `apps/project.yml`, commit as `Release vX.Y.Z` and push; then `git tag -a vX.Y.Z -m vX.Y.Z`, `git push origin vX.Y.Z` and `gh release create vX.Y.Z --title "Precise EN vX.Y.Z" --notes "<that version's CHANGELOG section>"`.
+To release from a clean, pushed `main`: rename `[Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` with a fresh `## [Unreleased]` above it, set `MARKETING_VERSION` in `apps/project.yml`, commit as `Release vX.Y.Z` and push; then `git tag -a vX.Y.Z -m vX.Y.Z`, `git push origin vX.Y.Z` and `gh release create vX.Y.Z --title "precise//en vX.Y.Z" --notes "<that version's CHANGELOG section>"`.
