@@ -11,7 +11,7 @@ All notable changes to precise//en are documented here. The format follows [Keep
 - Added an iPhone app with the same Review and Words, sharing words and progress with the Mac through Cloudflare D1.
 - Added a warning in the menu bar when the latest capture failed, with the error and the capture log one click away.
 - Added a difficulty to every word (common, advanced or rare), judged when the word is captured and shown on its card, its row and its page.
-- Added Archive, I know it (key a on the Mac) under a revealed answer in Review, to archive a word you already know without leaving the card.
+- Added an Archive button (key a on the Mac) above the ratings of a revealed answer in Review, to archive a word you already know without leaving the card.
 - Added swiping a word away in Words to archive it as known: it leaves review, is never suggested again, and can be restored from Show Archived Words.
 - Added difficulty filters, sorting by newest or A–Z, and search by word or definition to Words.
 - Added a Stats screen that sums up words saved, learned, known and due in one sentence, and draws every word as a tick by tier, by difficulty and by week saved.

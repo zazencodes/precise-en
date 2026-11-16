@@ -113,7 +113,7 @@ public struct ReviewView: View {
             archive(word)
         } label: {
             HStack(spacing: 6) {
-                Label("Archive, I know it", systemImage: "archivebox")
+                Label("Archive", systemImage: "archivebox")
                 #if os(macOS)
                 Text("a")
                     .font(.caption.monospaced())
