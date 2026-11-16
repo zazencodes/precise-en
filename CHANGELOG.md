@@ -4,6 +4,8 @@ All notable changes to precise//en are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-16
+
 ### Added
 
 - Added a prompt hook for Claude Code and Codex that saves the one word that would have said a long prompt better, with its definition, the phrase it replaces and a tighter rewrite of the prompt.
