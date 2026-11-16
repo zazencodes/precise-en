@@ -44,6 +44,9 @@ struct PreciseENApp: App {
                 .containerBackground(Theme.canvas, for: .window)
                 .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
                 .task { await store.refresh() }
+                // A menu bar app while the window is closed; in the Dock and the app switcher while it is open.
+                .onAppear { NSApp.setActivationPolicy(.regular) }
+                .onDisappear { NSApp.setActivationPolicy(.accessory) }
         }
         .defaultSize(width: 900, height: 640)
         .defaultLaunchBehavior(.suppressed)

@@ -23,6 +23,7 @@ All notable changes to precise//en are documented here. The format follows [Keep
 - Moved the due count to the top of Review and showed new words by their pink dot, in place of tab bar badges.
 - Replaced the app icon with a custom off-white //en mark on charcoal, the same on the iPhone and the Mac.
 - Showed the 1 to 4 key hints on the rating buttons only on the Mac.
+- Showed the Mac app in the Dock and the app switcher while its window is open.
 
 ### Removed
 
