@@ -8,7 +8,7 @@ Every screenshot lives in `docs/assets/screenshots/`: six single screens, and th
 | `mac-review-answer.png` | The same card with its answer |
 | `iphone-review.png` | The iPhone's Review |
 | `iphone-review-answer.png` | The answer |
-| `iphone-words.png` | Words |
+| `iphone-words.png` | Words, filtered to Advanced |
 | `iphone-stats.png` | Stats |
 | `mac.png` | Both Mac screens side by side, for the README |
 | `iphone.png` | All four iPhone screens side by side, for the README |
@@ -111,7 +111,7 @@ sleep 2
 xcrun simctl io $device screenshot $out/iphone-review-answer.png
 ```
 
-Click **Words** in the Simulator's tab bar, then:
+Click **Words** in the Simulator's tab bar, then **Advanced** in its filter, then:
 
 ```sh
 xcrun simctl io $device screenshot $out/iphone-words.png
