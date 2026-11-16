@@ -19,7 +19,7 @@ Learn the English words you could have used in your own prompts.
 When you send Claude Code or Codex a long prompt, precise//en asks a cheap background model for the one word that would have said part of it better, such as **idempotent** for *make sure running it twice doesn't break anything*. It saves the word with its definition, difficulty (`common`, `advanced` or `rare`), your phrase and a tighter rewrite of the prompt. A Mac menu bar app shows when new words have arrived and reviews them with spaced repetition, Anki-style. An iPhone app reviews the same words.
 
 <p align="center">
-  <img src="docs/assets/mac-review.png" alt="The Mac app's Review window: one word set large, with Show Answer below it" width="100%">
+  <img src="docs/assets/mac-review.png" alt="The Mac app's Review window with the answer shown: the word, its definition, the phrase you wrote and the rewrite that uses it, above Archive and the four ratings" width="100%">
 </p>
 
 <p align="center">
