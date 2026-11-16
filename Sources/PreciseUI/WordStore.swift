@@ -79,9 +79,10 @@ public final class WordStore {
 
 extension APIConfig {
     /// The apps' API and token, set in Info.plist at build time from `~/.config/precise-en/config.json`.
+    /// The URL is https, or http to a Worker on this machine under `wrangler dev` (docs/screenshots.md).
     public static func fromInfoPlist(_ bundle: Bundle = .main) -> APIConfig {
         guard let url = (bundle.object(forInfoDictionaryKey: "PreciseENURL") as? String).flatMap(URL.init(string:)),
-              url.scheme == "https",
+              url.scheme == "https" || (url.scheme == "http" && url.host == "localhost"),
               let token = bundle.object(forInfoDictionaryKey: "PreciseENToken") as? String, !token.isEmpty
         else {
             fatalError("Info.plist has no PreciseENURL and PreciseENToken: build the app with build.sh")

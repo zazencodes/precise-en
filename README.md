@@ -149,7 +149,7 @@ swift test                                      # the Swift tests
 cd worker && npm test && npm run typecheck      # the Worker's tests, in the Workers runtime, and its types
 ```
 
-Set `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` if `xcode-select` points at the Command Line Tools. `./build.sh` builds `build/precise::en.app` and `build/precise-en` without installing them. `apps/configure.sh` generates `apps/PreciseEN.xcodeproj` from `apps/project.yml` for opening in Xcode. `swift apps/icon.swift` renders the //en icon into every Mac and iPhone size.
+Set `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` if `xcode-select` points at the Command Line Tools. `./build.sh` builds `build/precise::en.app` and `build/precise-en` without installing them. `apps/configure.sh` generates `apps/PreciseEN.xcodeproj` from `apps/project.yml` for opening in Xcode. `swift apps/icon.swift` renders the //en icon into every Mac and iPhone size. [docs/screenshots.md](docs/screenshots.md) retakes the screenshots above.
 
 | Folder | Role |
 |---|---|

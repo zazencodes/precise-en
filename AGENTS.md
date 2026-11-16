@@ -16,6 +16,7 @@ precise//en: learn the English words you could have used in your own prompts. A 
 - `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift apps/icon.swift`: renders the canonical //en vector artwork into every Mac and iPhone app icon size.
 - `./build.sh`: `build/precise::en.app` and `build/precise-en`. `./install.sh`: replaces `/Applications/precise::en.app`, launches it, and installs the CLI to `~/.local/bin/precise-en`. `./install-iphone.sh`: builds and installs the iPhone app on the paired iPhone.
 - `cd worker && npm run deploy`: applies D1 migrations and deploys the Worker.
+- `docs/screenshots.md`: how to retake the README's two screenshots (`docs/assets/mac.png`, `docs/assets/iphone.png`) from a local copy of the word list. Read it before changing them.
 - `apps/configure.sh`: writes `apps/Secrets.xcconfig` and generates `apps/PreciseEN.xcodeproj` for opening in Xcode. Both are git-ignored.
 - `echo "<prompt>" | .build/debug/precise-en suggest`: one capture, synchronously, printing what happened. It saves a real word (words are archived rather than deleted through the API, so remove test rows from D1 directly afterwards).
 
