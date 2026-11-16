@@ -29,72 +29,117 @@ public struct WordsView: View {
     }
 
     public var body: some View {
-        NavigationSplitView {
-            List(selection: $selection) {
-                Picker("Difficulty", selection: $difficulty) {
-                    ForEach(WordsFilter.allCases, id: \.self) { option in
-                        Text(option.title).tag(option)
-                    }
+        split
+            .onChange(of: selection) {
+                if let word = selected, !word.isArchived {
+                    Task { await store.markSeen(word) }
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
+            }
+            .onChange(of: showingArchived) {
+                selection = nil
+            }
+    }
+
+    @ViewBuilder
+    private var split: some View {
+        #if os(macOS)
+        // A NavigationSplitView would give the window a sidebar that pushes the Review, Words and
+        // Stats tabs off center, so the Mac lays the list and the page side by side within the tab.
+        // The hairline between them stops below the toolbar, where a split view's divider would run
+        // up through the tabs.
+        HStack(spacing: 0) {
+            list
+                .scrollIndicators(.never)
+                .frame(width: 320)
+            Rectangle()
+                .fill(Theme.hairline)
+                .frame(width: 1)
+            detail
+        }
+        #else
+        NavigationSplitView {
+            list
+        } detail: {
+            detail
+        }
+        #endif
+    }
+
+    private var difficultyPicker: some View {
+        Picker("Difficulty", selection: $difficulty) {
+            ForEach(WordsFilter.allCases, id: \.self) { option in
+                Text(option.title).tag(option)
+            }
+        }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+    }
+
+    private var list: some View {
+        #if os(macOS)
+        // Pinned above the list, so the filter stays in reach and rows never scroll up under the toolbar.
+        VStack(spacing: 0) {
+            difficultyPicker
+                .padding(EdgeInsets(top: 4, leading: 20, bottom: 12, trailing: 20))
+            words
+        }
+        #else
+        words
+        #endif
+    }
+
+    private var words: some View {
+        List(selection: $selection) {
+            #if os(iOS)
+            difficultyPicker
                 .listRowInsets(EdgeInsets(top: 4, leading: 20, bottom: 12, trailing: 20))
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
+            #endif
 
-                ForEach(visible) { word in
-                    row(word)
-                        .tag(word.id)
-                        .listRowInsets(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 20))
-                        .listRowBackground(Color.clear)
-                        .listRowSeparatorTint(Theme.hairline)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(showingArchived ? "Restore" : "Archive",
-                                   systemImage: showingArchived ? "arrow.uturn.backward" : "archivebox") {
-                                move(word)
-                            }
-                            .tint(Theme.fillPressed)
+            ForEach(visible) { word in
+                row(word)
+                    .tag(word.id)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 5, bottom: 0, trailing: 20))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparatorTint(Theme.hairline)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(showingArchived ? "Restore" : "Archive",
+                               systemImage: showingArchived ? "arrow.uturn.backward" : "archivebox") {
+                            move(word)
                         }
-                }
-            }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            .background(Theme.canvas)
-            .overlay { emptyState }
-            .refreshable { await store.refresh() }
-            .navigationTitle(showingArchived ? "Archived" : "Words")
-            #if os(macOS)
-            // Inside the Mac window's TabView the split view ignores navigationSplitViewColumnWidth.
-            .frame(minWidth: 280)
-            #endif
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.large)
-            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search words and meanings")
-            #else
-            .searchable(text: $search, prompt: "Search words and meanings")
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) { menu }
-            }
-        } detail: {
-            if let word = selected {
-                WordPage(word: word, now: store.now) { move(word) }
-                    .id(word.id)
-            } else {
-                Text(showingArchived ? "Choose a word to restore it." : "Choose a word to read it.")
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(Theme.tertiary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Theme.canvas)
+                        .tint(Theme.fillPressed)
+                    }
             }
         }
-        .onChange(of: selection) {
-            if let word = selected, !word.isArchived {
-                Task { await store.markSeen(word) }
-            }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Theme.canvas)
+        .overlay { emptyState }
+        .refreshable { await store.refresh() }
+        .navigationTitle(showingArchived ? "Archived" : "Words")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.large)
+        .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search words and meanings")
+        #else
+        .searchable(text: $search, prompt: "Search words and meanings")
+        #endif
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) { menu }
         }
-        .onChange(of: showingArchived) {
-            selection = nil
+    }
+
+    @ViewBuilder
+    private var detail: some View {
+        if let word = selected {
+            WordPage(word: word, now: store.now) { move(word) }
+                .id(word.id)
+        } else {
+            Text(showingArchived ? "Choose a word to restore it." : "Choose a word to read it.")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(Theme.tertiary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Theme.canvas)
         }
     }
 

@@ -24,6 +24,7 @@ All notable changes to precise//en are documented here. The format follows [Keep
 - Replaced the app icon with a custom off-white //en mark on charcoal, the same on the iPhone and the Mac.
 - Showed the 1 to 4 key hints on the rating buttons only on the Mac.
 - Showed the Mac app in the Dock and the app switcher while its window is open.
+- Kept Review, Words and Stats centered at the top of the Mac window when Words shows its list.
 
 ### Removed
 
