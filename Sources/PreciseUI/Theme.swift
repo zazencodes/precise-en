@@ -14,6 +14,9 @@ public enum Theme {
     static let secondary = gray(0xA3)
     /// Labels that name a part of the screen ("You wrote", week dates). 4.6:1 on the canvas.
     static let tertiary = gray(0x7C)
+    /// A word drawn as a tick in Stats: lit when it counts, dim when it only fills the track.
+    static let tickOn = gray(0xF2)
+    static let tickOff = gray(0x2B)
     /// The ZazenCodes pink.
     static let pink = Color(red: 0xF3 / 255, green: 0x8A / 255, blue: 0xC8 / 255)
 
@@ -66,6 +69,24 @@ enum TypeScale {
         72
         #else
         60
+        #endif
+    }
+
+    /// Row names, counts and section details in Stats.
+    static var statLabel: Font {
+        #if os(macOS)
+        .system(size: 13)
+        #else
+        .subheadline
+        #endif
+    }
+
+    /// The note under the Stats summary.
+    static var note: Font {
+        #if os(macOS)
+        .system(size: 12)
+        #else
+        .footnote
         #endif
     }
 

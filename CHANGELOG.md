@@ -13,6 +13,7 @@ All notable changes to Precise EN are documented here. The format follows [Keep 
 - Added a difficulty to every word (common, advanced or rare), judged when the word is captured and shown on its card, its row and its page.
 - Added swiping a word away in Words to archive it as known: it leaves review, is never suggested again, and can be restored from Show Archived Words.
 - Added difficulty filters, sorting by newest or A–Z, and search by word or definition to Words.
+- Added a Stats screen that sums up words saved, learned, known and due in one sentence, and draws every word as a tick by tier, by difficulty and by week saved.
 
 ### Changed
 

@@ -137,6 +137,7 @@ struct MenuContent: View {
     var body: some View {
         Button(store.due.isEmpty ? "Review" : "Review · \(store.due.count) due") { show(.review) }
         Button(store.newWords.isEmpty ? "Words" : "Words · \(store.newWords.count) new") { show(.words) }
+        Button("Stats") { show(.stats) }
         if let error = store.error {
             Divider()
             Text("Last request failed: \(error.prefix(90))")

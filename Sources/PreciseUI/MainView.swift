@@ -2,10 +2,10 @@ import PreciseKit
 import SwiftUI
 
 public enum AppTab: Hashable, Sendable {
-    case review, words
+    case review, words, stats
 }
 
-/// The whole app on both platforms: Review and Words. Each screen keeps the last request's
+/// The whole app on both platforms: Review, Words and Stats. Each screen keeps the last request's
 /// failure in a bar along its bottom until a request succeeds.
 public struct MainView: View {
     @Binding private var tab: AppTab
@@ -24,6 +24,10 @@ public struct MainView: View {
                 .failureBar()
                 .tabItem { Label("Words", systemImage: "character.book.closed") }
                 .tag(AppTab.words)
+            StatsView()
+                .failureBar()
+                .tabItem { Label("Stats", systemImage: "chart.bar") }
+                .tag(AppTab.stats)
         }
         .tint(.white)
         .preferredColorScheme(.dark)
