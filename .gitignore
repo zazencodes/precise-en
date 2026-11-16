@@ -1,0 +1,10 @@
+.build/
+build/
+apps/PreciseEN.xcodeproj/
+apps/Secrets.xcconfig
+apps/Mac/Info.plist
+apps/iOS/Info.plist
+worker/node_modules/
+worker/.wrangler/
+worker/worker-configuration.d.ts
+.swiftpm/

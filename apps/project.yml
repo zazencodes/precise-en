@@ -1,0 +1,71 @@
+# The Mac and iPhone apps. configure.sh writes Secrets.xcconfig (the API URL and token, the Apple
+# team and the bundle ID, from ~/.config/precise-en/config.json) and generates PreciseEN.xcodeproj
+# from this file; both are ignored by git.
+name: PreciseEN
+options:
+  createIntermediateGroups: true
+configFiles:
+  Debug: Secrets.xcconfig
+  Release: Secrets.xcconfig
+packages:
+  PreciseEN:
+    path: ..
+settings:
+  base:
+    PRODUCT_NAME: Precise EN
+    MARKETING_VERSION: 0.1.0
+    CURRENT_PROJECT_VERSION: 1
+    SWIFT_VERSION: "6.0"
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_CFBundleDisplayName: Precise EN
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+targets:
+  PreciseENMac:
+    type: application
+    platform: macOS
+    scheme: {}
+    deploymentTarget: "15.0"
+    sources: [Mac, Assets.xcassets]
+    dependencies:
+      - package: PreciseEN
+        product: PreciseKit
+      - package: PreciseEN
+        product: PreciseUI
+    info:
+      path: Mac/Info.plist
+      properties:
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.education
+        PreciseENURL: $(PRECISE_EN_URL)
+        PreciseENToken: $(PRECISE_EN_TOKEN)
+    settings:
+      base:
+        # Signed with the Apple Development certificate and no profile, so Open at Login keeps
+        # recognising the app across rebuilds.
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: Apple Development
+        ENABLE_HARDENED_RUNTIME: YES
+  PreciseENiOS:
+    type: application
+    platform: iOS
+    scheme: {}
+    deploymentTarget: "17.0"
+    sources: [iOS, Assets.xcassets]
+    dependencies:
+      - package: PreciseEN
+        product: PreciseKit
+      - package: PreciseEN
+        product: PreciseUI
+    info:
+      path: iOS/Info.plist
+      properties:
+        UILaunchScreen: {}
+        PreciseENURL: $(PRECISE_EN_URL)
+        PreciseENToken: $(PRECISE_EN_TOKEN)
+    settings:
+      base:
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait

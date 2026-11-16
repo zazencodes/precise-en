@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "precise-en",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-15",
+  "observability": { "enabled": true },
+  // TOKEN, the API's bearer token, is a secret: `wrangler secret put TOKEN`.
+  // No database_id: Wrangler finds the database by its name in your Cloudflare account.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "precise-en",
+      "migrations_dir": "migrations"
+    }
+  ]
+}
