@@ -1,63 +1,145 @@
-// Renders the app icon into Assets.xcassets/AppIcon.appiconset: `swift apps/icon.swift`.
-// "P//" for PRECISE//EN in Inter Black: a white P and purple slashes on the ZazenCodes near-black.
+// Canonical icon artwork. Render every iOS and Mac size: swift apps/icon.swift
+// Custom outlines keep the lettering reproducible without installed fonts.
 import CoreGraphics
-import CoreText
 import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 
-let folder = URL(filePath: #filePath).deletingLastPathComponent().appending(path: "Assets.xcassets/AppIcon.appiconset")
-
+let folder = URL(filePath: #filePath).deletingLastPathComponent()
+  .appending(path: "Assets.xcassets/AppIcon.appiconset")
 func color(_ hex: Int) -> CGColor {
-    CGColor(srgbRed: CGFloat(hex >> 16 & 0xFF) / 255, green: CGFloat(hex >> 8 & 0xFF) / 255, blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
+  CGColor(
+    srgbRed: CGFloat(hex >> 16 & 255) / 255,
+    green: CGFloat(hex >> 8 & 255) / 255,
+    blue: CGFloat(hex & 255) / 255, alpha: 1)
 }
 
-/// The iPhone icon fills the square (iOS rounds it); the Mac icon sits on the macOS icon grid.
-func render(pixels: Int, mac: Bool, to name: String) {
-    let size = CGFloat(pixels)
-    let context = CGContext(
-        data: nil, width: pixels, height: pixels, bitsPerComponent: 8, bytesPerRow: 0,
-        space: CGColorSpace(name: CGColorSpace.sRGB)!,
-        bitmapInfo: (mac ? CGImageAlphaInfo.premultipliedLast : CGImageAlphaInfo.noneSkipLast).rawValue
-    )!
-    let tile = mac ? CGRect(x: size * 100 / 1024, y: size * 100 / 1024, width: size * 824 / 1024, height: size * 824 / 1024)
-        : CGRect(x: 0, y: 0, width: size, height: size)
-    let shape = mac ? CGPath(roundedRect: tile, cornerWidth: tile.width * 0.225, cornerHeight: tile.width * 0.225, transform: nil)
-        : CGPath(rect: tile, transform: nil)
-    context.addPath(shape)
-    context.clip()
-    let gradient = CGGradient(colorsSpace: nil, colors: [color(0x1A232E), color(0x0B0F14)] as CFArray, locations: [0, 1])!
-    context.drawLinearGradient(gradient, start: CGPoint(x: tile.midX, y: tile.maxY), end: CGPoint(x: tile.midX, y: tile.minY), options: [])
+// The e has an open aperture and optical overshoot; slash weight matches the stems.
+func mark(_ c: CGContext) {
+  c.setFillColor(color(0xF6F6F6))
+  let p = CGMutablePath()
+  for x in [CGFloat(150), 254] {
+    p.move(to: CGPoint(x: x, y: 678))
+    p.addLine(to: CGPoint(x: x + 57, y: 678))
+    p.addLine(to: CGPoint(x: x + 148, y: 346))
+    p.addLine(to: CGPoint(x: x + 91, y: 346))
+    p.closeSubpath()
+  }
+  // Coordinates use a top-left drawing space.
+  p.move(to: CGPoint(x: 611, y: 533))
+  p.addCurve(
+    to: CGPoint(x: 501, y: 411), control1: CGPoint(x: 611, y: 454),
+    control2: CGPoint(x: 573, y: 411))
+  p.addCurve(
+    to: CGPoint(x: 387, y: 535), control1: CGPoint(x: 430, y: 411),
+    control2: CGPoint(x: 387, y: 462))
+  p.addCurve(
+    to: CGPoint(x: 508, y: 660), control1: CGPoint(x: 387, y: 615),
+    control2: CGPoint(x: 431, y: 660))
+  p.addCurve(
+    to: CGPoint(x: 605, y: 620), control1: CGPoint(x: 551, y: 660),
+    control2: CGPoint(x: 586, y: 645))
+  p.addLine(to: CGPoint(x: 574, y: 584))
+  p.addCurve(
+    to: CGPoint(x: 510, y: 610), control1: CGPoint(x: 555, y: 603),
+    control2: CGPoint(x: 535, y: 610))
+  p.addCurve(
+    to: CGPoint(x: 446, y: 555), control1: CGPoint(x: 472, y: 610),
+    control2: CGPoint(x: 450, y: 591))
+  p.addLine(to: CGPoint(x: 611, y: 555))
+  p.closeSubpath()
+  p.move(to: CGPoint(x: 446, y: 511))
+  p.addCurve(
+    to: CGPoint(x: 501, y: 460), control1: CGPoint(x: 451, y: 478),
+    control2: CGPoint(x: 469, y: 460))
+  p.addCurve(
+    to: CGPoint(x: 554, y: 511), control1: CGPoint(x: 533, y: 460),
+    control2: CGPoint(x: 551, y: 478))
+  p.closeSubpath()
+  p.move(to: CGPoint(x: 645, y: 654))
+  p.addLine(to: CGPoint(x: 645, y: 417))
+  p.addLine(to: CGPoint(x: 700, y: 417))
+  p.addLine(to: CGPoint(x: 700, y: 447))
+  p.addCurve(
+    to: CGPoint(x: 772, y: 411), control1: CGPoint(x: 716, y: 424),
+    control2: CGPoint(x: 740, y: 411))
+  p.addCurve(
+    to: CGPoint(x: 861, y: 510), control1: CGPoint(x: 831, y: 411),
+    control2: CGPoint(x: 861, y: 446))
+  p.addLine(to: CGPoint(x: 861, y: 654))
+  p.addLine(to: CGPoint(x: 803, y: 654))
+  p.addLine(to: CGPoint(x: 803, y: 519))
+  p.addCurve(
+    to: CGPoint(x: 755, y: 465), control1: CGPoint(x: 803, y: 482),
+    control2: CGPoint(x: 787, y: 465))
+  p.addCurve(
+    to: CGPoint(x: 703, y: 521), control1: CGPoint(x: 723, y: 465),
+    control2: CGPoint(x: 703, y: 488))
+  p.addLine(to: CGPoint(x: 703, y: 654))
+  p.closeSubpath()
+  c.addPath(p)
+  c.drawPath(using: .eoFill)
 
-    let font = CTFontCreateWithName("Inter-Regular_Black" as CFString, tile.width * 0.36, nil)
-    precondition(CTFontCopyPostScriptName(font) as String == "Inter-Regular_Black", "install Inter (the brand font) to render the icon")
-    let text = NSMutableAttributedString(string: "P//", attributes: [
-        NSAttributedString.Key(kCTFontAttributeName as String): font,
-        NSAttributedString.Key(kCTForegroundColorAttributeName as String): color(0xFFFFFF),
-        NSAttributedString.Key(kCTKernAttributeName as String): -tile.width * 0.01,
-    ])
-    text.addAttribute(NSAttributedString.Key(kCTForegroundColorAttributeName as String), value: color(0x7C3AED), range: NSRange(location: 1, length: 2))
-    let line = CTLineCreateWithAttributedString(text)
-    let bounds = CTLineGetImageBounds(line, context)
-    context.textPosition = CGPoint(x: tile.midX - bounds.midX, y: tile.midY - bounds.midY)
-    CTLineDraw(line, context)
+}
 
-    let destination = CGImageDestinationCreateWithURL(folder.appending(path: name) as CFURL, UTType.png.identifier as CFString, 1, nil)!
-    CGImageDestinationAddImage(destination, context.makeImage()!, nil)
-    precondition(CGImageDestinationFinalize(destination), "writing \(name)")
+func render(_ pixels: Int, mac: Bool) -> CGImage {
+  let c = CGContext(
+    data: nil, width: pixels, height: pixels, bitsPerComponent: 8, bytesPerRow: 0,
+    space: CGColorSpace(name: CGColorSpace.sRGB)!,
+    bitmapInfo: (mac ? CGImageAlphaInfo.premultipliedLast : CGImageAlphaInfo.noneSkipLast).rawValue)!
+  c.scaleBy(x: CGFloat(pixels) / 1024, y: CGFloat(pixels) / 1024)
+  c.translateBy(x: 0, y: 1024)
+  c.scaleBy(x: 1, y: -1)
+  if mac {
+    let tile = CGRect(x: 100, y: 100, width: 824, height: 824)
+    let p = CGPath(roundedRect: tile, cornerWidth: 185, cornerHeight: 185, transform: nil)
+    c.setShadow(
+      offset: CGSize(width: 0, height: -8), blur: 18, color: CGColor(gray: 0, alpha: 0.25))
+    c.addPath(p)
+    c.setFillColor(color(0x1A1A1A))
+    c.fillPath()
+    c.setShadow(offset: .zero, blur: 0, color: nil)
+    c.translateBy(x: 100, y: 100)
+    c.scaleBy(x: 824 / 1024, y: 824 / 1024)
+  } else {
+    c.setFillColor(color(0x1A1A1A))
+    c.fill(CGRect(x: 0, y: 0, width: 1024, height: 1024))
+  }
+  mark(c)
+  return c.makeImage()!
+}
+func save(_ image: CGImage, _ path: URL) {
+  let d = CGImageDestinationCreateWithURL(path as CFURL, UTType.png.identifier as CFString, 1, nil)!
+  CGImageDestinationAddImage(d, image, nil)
+  precondition(CGImageDestinationFinalize(d))
 }
 
 var images: [[String: String]] = []
-render(pixels: 1024, mac: false, to: "ios-1024.png")
-images.append(["filename": "ios-1024.png", "idiom": "universal", "platform": "ios", "size": "1024x1024"])
+save(render(1024, mac: false), folder.appending(path: "ios-1024.png"))
+images.append([
+  "filename": "ios-1024.png", "idiom": "universal", "platform": "ios", "size": "1024x1024",
+])
 for points in [16, 32, 128, 256, 512] {
-    for scale in [1, 2] {
-        let name = "mac-\(points)@\(scale)x.png"
-        render(pixels: points * scale, mac: true, to: name)
-        images.append(["filename": name, "idiom": "mac", "scale": "\(scale)x", "size": "\(points)x\(points)"])
-    }
+  for scale in [1, 2] {
+    let name = "mac-\(points)@\(scale)x.png"
+    save(render(points * scale, mac: true), folder.appending(path: name))
+    images.append([
+      "filename": name, "idiom": "mac", "scale": "\(scale)x", "size": "\(points)x\(points)",
+    ])
+  }
 }
 let contents: [String: Any] = ["images": images, "info": ["author": "xcode", "version": 1]]
 try JSONSerialization.data(withJSONObject: contents, options: [.prettyPrinted, .sortedKeys])
-    .write(to: folder.appending(path: "Contents.json"))
+  .write(to: folder.appending(path: "Contents.json"))
+// Check the generated assets, including the opacity required by the iOS App Store.
+for entry in images {
+  let source = CGImageSourceCreateWithURL(folder.appending(path: entry["filename"]!) as CFURL, nil)!
+  let image = CGImageSourceCreateImageAtIndex(source, 0, nil)!
+  let points = Int(entry["size"]!.split(separator: "x")[0])!
+  let scale = Int(entry["scale"]?.dropLast() ?? "1")!
+  precondition(image.width == points * scale && image.height == points * scale)
+  precondition(
+    entry["idiom"] != "universal"
+      || [.none, .noneSkipFirst, .noneSkipLast].contains(image.alphaInfo))
+}
 print("Rendered \(images.count) icons into \(folder.path)")

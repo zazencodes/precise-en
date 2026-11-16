@@ -21,6 +21,7 @@ All notable changes to precise//en are documented here. The format follows [Keep
 - Moved the Mac app to /Applications/precise::en.app, a file name Finder shows as precise//en.
 - Redesigned the app in dark grays and heavy type: the review card sets the word large across the screen, Show Answer is a white button, and the brand pink stays on the word in its rewrite and the new-word dot.
 - Moved the due count to the top of Review and showed new words by their pink dot, in place of tab bar badges.
+- Replaced the app icon with a custom off-white //en mark on charcoal, the same on the iPhone and the Mac.
 - Showed the 1 to 4 key hints on the rating buttons only on the Mac.
 
 ### Removed

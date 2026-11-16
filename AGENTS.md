@@ -13,6 +13,7 @@ precise//en: learn the English words you could have used in your own prompts. A 
 ## Commands
 
 - `swift test`: the Swift tests. `cd worker && npm test && npm run typecheck`: the Worker's tests (in the Workers runtime) and types.
+- `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift apps/icon.swift`: renders the canonical //en vector artwork into every Mac and iPhone app icon size.
 - `./build.sh`: `build/precise::en.app` and `build/precise-en`. `./install.sh`: replaces `/Applications/precise::en.app`, launches it, and installs the CLI to `~/.local/bin/precise-en`. `./install-iphone.sh`: builds and installs the iPhone app on the paired iPhone.
 - `cd worker && npm run deploy`: applies D1 migrations and deploys the Worker.
 - `apps/configure.sh`: writes `apps/Secrets.xcconfig` and generates `apps/PreciseEN.xcodeproj` for opening in Xcode. Both are git-ignored.
