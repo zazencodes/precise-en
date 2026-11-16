@@ -18,14 +18,18 @@ Learn the English words you could have used in your own prompts.
 
 When you send Claude Code or Codex a long prompt, precise//en asks a cheap background model for the one word that would have said part of it better, such as **idempotent** for *make sure running it twice doesn't break anything*. It saves the word with its definition, difficulty (`common`, `advanced` or `rare`), your phrase and a tighter rewrite of the prompt. A Mac menu bar app shows when new words have arrived and reviews them with spaced repetition, Anki-style. An iPhone app reviews the same words.
 
-<p align="center">
-  <img src="docs/assets/mac-review.png" alt="The Mac app's Review window with the answer shown: the word, its definition, the phrase you wrote and the rewrite that uses it, above Archive and the four ratings" width="100%">
-</p>
+## Screenshots
+
+### Mac
 
 <p align="center">
-  <img src="docs/assets/iphone-review.png" alt="Review on the iPhone" width="32%">
-  <img src="docs/assets/iphone-words.png" alt="Words on the iPhone: each word with its definition and difficulty" width="32%">
-  <img src="docs/assets/iphone-stats.png" alt="Stats on the iPhone: words saved, due, learned and known, by tier and difficulty" width="32%">
+  <img src="docs/assets/mac.png" alt="The Mac app's Review window twice: a card showing one word set large above Show Answer, then the same card answered, with the definition, the phrase you wrote, the rewrite that uses the word, Archive and the four ratings" width="100%">
+</p>
+
+### iPhone
+
+<p align="center">
+  <img src="docs/assets/iphone.png" alt="The iPhone app's Review card, its answer, Words with each word's definition and difficulty, and Stats with words saved, due, learned and known by tier and difficulty" width="100%">
 </p>
 
 ## Features
