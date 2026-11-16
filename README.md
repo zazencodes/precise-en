@@ -103,7 +103,9 @@ python3 -c 'import json, os; print(json.load(open(os.path.expanduser("~/.config/
 ./install-iphone.sh   # the iPhone app
 ```
 
-`./install.sh` builds the Mac app into `/Applications/precise::en.app` (Finder shows it as precise//en), opens it, adds it to Login Items and installs `precise-en` in `~/.local/bin`. The Mac app is signed with your Apple Development certificate; if you have none, create one in Xcode → Settings → Accounts → Manage Certificates. `./install-iphone.sh` installs the iPhone app on your paired, unlocked iPhone.
+`./install.sh` builds the Mac app into `/Applications/precise::en.app` (Finder shows it as precise//en), opens it, adds it to Login Items and installs `precise-en` in `~/.local/bin`. `./install-iphone.sh` installs the iPhone app on your paired, unlocked iPhone.
+
+Both sign with the Apple account you are signed in to in Xcode → Settings → Accounts. The Mac app needs an Apple Development certificate; if you have none, create one there under Manage Certificates.
 
 The URL and token are built into the apps, so run both again after changing either.
 
