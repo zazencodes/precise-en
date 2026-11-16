@@ -8,6 +8,9 @@ public enum Theme {
     /// Buttons, the failure bar and other filled controls.
     static let fill = gray(0x1F)
     static let fillPressed = gray(0x2C)
+    /// The button that moves you on (Show Answer): lighter than `fill`, the gray of a selected row.
+    static let raised = gray(0x3A)
+    static let raisedPressed = gray(0x48)
     /// Separators between rows.
     static let hairline = gray(0x26)
     /// Supporting text: definitions in lists, your own phrase, labels beside numbers.

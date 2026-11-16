@@ -11,6 +11,7 @@ All notable changes to precise//en are documented here. The format follows [Keep
 - Added an iPhone app with the same Review and Words, sharing words and progress with the Mac through Cloudflare D1.
 - Added a warning in the menu bar when the latest capture failed, with the error and the capture log one click away.
 - Added a difficulty to every word (common, advanced or rare), judged when the word is captured and shown on its card, its row and its page.
+- Added Archive, I know it (key a on the Mac) under a revealed answer in Review, to archive a word you already know without leaving the card.
 - Added swiping a word away in Words to archive it as known: it leaves review, is never suggested again, and can be restored from Show Archived Words.
 - Added difficulty filters, sorting by newest or A–Z, and search by word or definition to Words.
 - Added a Stats screen that sums up words saved, learned, known and due in one sentence, and draws every word as a tick by tier, by difficulty and by week saved.
@@ -19,7 +20,7 @@ All notable changes to precise//en are documented here. The format follows [Keep
 
 - Renamed the apps to precise//en, all lowercase, on the iPhone home screen and throughout the Mac app, including Finder, Spotlight and Launchpad.
 - Moved the Mac app to /Applications/precise::en.app, a file name Finder shows as precise//en.
-- Redesigned the app in dark grays and heavy type: the review card sets the word large across the screen, Show Answer is a white button, and the brand pink stays on the word in its rewrite and the new-word dot.
+- Redesigned the app in dark grays and heavy type: the review card sets the word large across the screen, Show Answer is a large gray button, and the brand pink stays on the word in its rewrite and the new-word dot.
 - Moved the due count to the top of Review and showed new words by their pink dot, in place of tab bar badges.
 - Replaced the app icon with a custom off-white //en mark on charcoal, the same on the iPhone and the Mac.
 - Showed the 1 to 4 key hints on the rating buttons only on the Mac.

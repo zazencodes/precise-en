@@ -1,7 +1,8 @@
 import PreciseKit
 import SwiftUI
 
-/// One due word at a time: recall what it means, show the answer, then rate how well you knew it.
+/// One due word at a time: recall what it means, show the answer, then rate how well you knew it,
+/// or archive it as one you already know.
 public struct ReviewView: View {
     @Environment(WordStore.self) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -87,25 +88,9 @@ public struct ReviewView: View {
     private func actions(_ word: Word) -> some View {
         Group {
             if revealedID == word.id {
-                HStack(spacing: 8) {
-                    ForEach(Array(Rating.allCases.enumerated()), id: \.element) { index, rating in
-                        Button {
-                            rate(word, rating)
-                        } label: {
-                            VStack(spacing: 1) {
-                                Text(rating.title)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                                #if os(macOS)
-                                Text("\(index + 1)")
-                                    .font(.caption.monospacedDigit())
-                                    .foregroundStyle(Theme.tertiary)
-                                #endif
-                            }
-                        }
-                        .buttonStyle(.secondaryAction)
-                        .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: [])
-                    }
+                VStack(spacing: 4) {
+                    archiveButton(word)
+                    ratings(word)
                 }
                 .transition(.opacity)
             } else {
@@ -122,10 +107,64 @@ public struct ReviewView: View {
         .padding(.bottom, 16)
     }
 
+    /// A quiet link above the ratings, for a word you knew before it was saved.
+    private func archiveButton(_ word: Word) -> some View {
+        Button {
+            archive(word)
+        } label: {
+            HStack(spacing: 6) {
+                Label("Archive, I know it", systemImage: "archivebox")
+                #if os(macOS)
+                Text("a")
+                    .font(.caption.monospaced())
+                    .foregroundStyle(Theme.tertiary)
+                #endif
+            }
+            .font(TypeScale.label)
+            .foregroundStyle(Theme.secondary)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .keyboardShortcut("a", modifiers: [])
+    }
+
+    private func ratings(_ word: Word) -> some View {
+        HStack(spacing: 8) {
+            ForEach(Array(Rating.allCases.enumerated()), id: \.element) { index, rating in
+                Button {
+                    rate(word, rating)
+                } label: {
+                    VStack(spacing: 1) {
+                        Text(rating.title)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                        #if os(macOS)
+                        Text("\(index + 1)")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(Theme.tertiary)
+                        #endif
+                    }
+                }
+                .buttonStyle(.secondaryAction)
+                .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: [])
+            }
+        }
+    }
+
     private func rate(_ word: Word, _ rating: Rating) {
         withAnimation(motion) { _ = rated.insert(word.id) }
         Task {
             await store.review(word, rating)
+            rated.remove(word.id)
+        }
+    }
+
+    /// Takes a word you already know out of review for good, as swiping it away in Words does.
+    private func archive(_ word: Word) {
+        withAnimation(motion) { _ = rated.insert(word.id) }
+        Task {
+            await store.archive(word)
             rated.remove(word.id)
         }
     }

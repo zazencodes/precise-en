@@ -34,7 +34,7 @@ When you send Claude Code or Codex a long prompt, precise//en asks a cheap backg
 - **Never in your way.** The hook returns at once and prints nothing, so your agent never waits and never sees it.
 - **Review, Anki-style.** A card shows the word. Show Answer (Space on the Mac) reveals its part of speech, difficulty and definition, your own phrase under *You wrote*, and the rewrite with the word in pink under *Precisely*. Rate it Again, Hard, Good or Easy (1 to 4 on the Mac), and it comes back when it is due.
 - **Words.** Every word with its definition and difficulty, a pink dot on each new one until you open it. Filter by difficulty, sort by newest or A–Z, and search words and meanings.
-- **Archive what you know.** Swipe a word away and it leaves review for good. It stays in your list, so it is never suggested again; Show Archived Words brings it back.
+- **Archive what you know.** Swipe a word away in Words, or archive it from its revealed card in Review, and it leaves review for good. It stays in your list, so it is never suggested again; Show Archived Words brings it back.
 - **Stats.** Words saved, due, learned and known in one sentence, and every word drawn as a tick by tier, by difficulty and by the week you saved it.
 - **The Mac and the iPhone in step.** One word list in Cloudflare D1, behind a small Worker that keeps the review schedule, so a word you review on one is done on the other.
 

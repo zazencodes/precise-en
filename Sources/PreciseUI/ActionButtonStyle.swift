@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The app's one button shape: a full-width 56pt slab. White with black type for the action that
-/// moves you on (Show Answer); dark gray with white type for a choice among equals (the ratings).
+/// The app's one button shape: a full-width 56pt slab with white type. Light gray for the action
+/// that moves you on (Show Answer); dark gray for a choice among equals (the ratings).
 struct ActionButtonStyle: ButtonStyle {
     enum Prominence {
         case primary, secondary
@@ -13,7 +13,7 @@ struct ActionButtonStyle: ButtonStyle {
         let shape = RoundedRectangle(cornerRadius: 16, style: .continuous)
         configuration.label
             .font(.body.weight(.semibold))
-            .foregroundStyle(prominence == .primary ? Color.black : Color.white)
+            .foregroundStyle(.white)
             .frame(maxWidth: .infinity, minHeight: 56)
             .background(background(pressed: configuration.isPressed), in: shape)
             .contentShape(shape)
@@ -23,7 +23,7 @@ struct ActionButtonStyle: ButtonStyle {
 
     private func background(pressed: Bool) -> Color {
         switch prominence {
-        case .primary: pressed ? Color(white: 0.82) : .white
+        case .primary: pressed ? Theme.raisedPressed : Theme.raised
         case .secondary: pressed ? Theme.fillPressed : Theme.fill
         }
     }
