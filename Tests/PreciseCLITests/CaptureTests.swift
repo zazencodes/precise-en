@@ -11,6 +11,7 @@ let prompt = """
 let word = NewWord(
     word: "idempotent",
     partOfSpeech: "adjective",
+    difficulty: .advanced,
     definition: "Producing the same result however many times it is applied.",
     phrase: "make sure running it twice doesn't break anything",
     rewrite: "Make the migration idempotent and check the seed data."
@@ -25,6 +26,10 @@ let word = NewWord(
 @Test func theAgentPromptCarriesThePromptAndSavedWords() {
     let text = Capture.agentPrompt(for: prompt, saved: ["terse", "canonical"])
     #expect(text.contains("Their saved words: canonical, terse"))
+    #expect(text.contains("already know and archived"))
+    #expect(text.contains("common"))
+    #expect(text.contains("advanced"))
+    #expect(text.contains("rare"))
     #expect(text.contains("<prompt>\n\(prompt)\n</prompt>"))
     #expect(Capture.agentPrompt(for: prompt, saved: []).contains("Their saved words: none yet"))
 }
@@ -32,7 +37,7 @@ let word = NewWord(
 @Test func parsesAWordOrNone() throws {
     #expect(try Capture.parse(#"  {"word": null}  "#) == .none)
     let answer = """
-        {"word": "idempotent", "part_of_speech": "adjective",
+        {"word": "idempotent", "part_of_speech": "adjective", "difficulty": "advanced",
          "definition": "Producing the same result however many times it is applied.",
          "phrase": "make sure running it twice doesn't break anything",
          "rewrite": "Make the migration idempotent and check the seed data."}
@@ -45,6 +50,16 @@ let word = NewWord(
     #expect(throws: Capture.ContractError.self) { try Capture.parse("```json\n{\"word\": null}\n```") }
     #expect(throws: Capture.ContractError.self) { try Capture.parse(#"{"answer": "terse"}"#) }
     #expect(throws: Capture.ContractError.self) { try Capture.parse(#"{"word": "terse", "definition": "x"}"#) }
+    let unknownDifficulty = """
+        {"word": "idempotent", "part_of_speech": "adjective", "difficulty": "obscure",
+         "definition": "d", "phrase": "p", "rewrite": "r"}
+        """
+    #expect(throws: Capture.ContractError.self) { try Capture.parse(unknownDifficulty) }
+    let missingDifficulty = """
+        {"word": "idempotent", "part_of_speech": "adjective",
+         "definition": "d", "phrase": "p", "rewrite": "r"}
+        """
+    #expect(throws: Capture.ContractError.self) { try Capture.parse(missingDifficulty) }
 }
 
 @Test func acceptsAWordWhosePhraseIsInThePrompt() {
@@ -56,8 +71,8 @@ let word = NewWord(
 @Test func rejectsAWordAlreadyInThePromptOrAnInventedPhrase() {
     #expect(Capture.rejection(of: word, prompt: prompt + " Keep it Idempotent.") == "idempotent is already in the prompt")
     let invented = NewWord(
-        word: word.word, partOfSpeech: word.partOfSpeech, definition: word.definition,
-        phrase: "ensure reruns are harmless", rewrite: word.rewrite
+        word: word.word, partOfSpeech: word.partOfSpeech, difficulty: word.difficulty,
+        definition: word.definition, phrase: "ensure reruns are harmless", rewrite: word.rewrite
     )
     #expect(Capture.rejection(of: invented, prompt: prompt) == "the phrase \"ensure reruns are harmless\" is not in the prompt")
 }

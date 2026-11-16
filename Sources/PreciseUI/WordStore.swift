@@ -6,6 +6,7 @@ import PreciseKit
 @MainActor
 @Observable
 public final class WordStore {
+    /// Every saved word, archived ones included, newest first.
     public private(set) var words: [Word] = []
     /// False until the first load succeeds.
     public private(set) var loaded = false
@@ -20,15 +21,21 @@ public final class WordStore {
         self.api = api
     }
 
+    /// Words still in review: everything not archived.
+    public var active: [Word] { words.filter { !$0.isArchived } }
+
+    /// Words you swiped away as known.
+    public var archived: [Word] { words.filter(\.isArchived) }
+
     /// Words to review now, the longest overdue first.
     public var due: [Word] {
-        words.filter { $0.isDue(at: now) }.sorted { $0.dueAt < $1.dueAt }
+        active.filter { $0.isDue(at: now) }.sorted { $0.dueAt < $1.dueAt }
     }
 
     /// Words saved since you last opened them.
-    public var newWords: [Word] { words.filter(\.isNew) }
+    public var newWords: [Word] { active.filter(\.isNew) }
 
-    public var nextDue: Date? { words.map(\.dueAt).filter { $0 > now }.min() }
+    public var nextDue: Date? { active.map(\.dueAt).filter { $0 > now }.min() }
 
     public func refresh() async {
         await perform {
@@ -46,11 +53,12 @@ public final class WordStore {
         await perform { self.replace(try await self.api.markSeen(word.id)) }
     }
 
-    public func delete(_ word: Word) async {
-        await perform {
-            try await self.api.delete(word.id)
-            self.words.removeAll { $0.id == word.id }
-        }
+    public func archive(_ word: Word) async {
+        await perform { self.replace(try await self.api.archive(word.id)) }
+    }
+
+    public func restore(_ word: Word) async {
+        await perform { self.replace(try await self.api.restore(word.id)) }
     }
 
     private func replace(_ word: Word) {

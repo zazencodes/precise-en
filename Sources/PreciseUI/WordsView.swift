@@ -1,23 +1,29 @@
 import PreciseKit
 import SwiftUI
 
-/// Every saved word, newest first. New words carry a purple dot until you open them.
+/// Every word in review, newest first. New words carry a purple dot until you open them. Swipe a
+/// word away to archive it as one you know.
 public struct WordsView: View {
     @Environment(WordStore.self) private var store
     @State private var selection: Word.ID?
-    @State private var deleting: Word?
 
     public init() {}
 
-    private var selected: Word? { store.words.first { $0.id == selection } }
+    private var selected: Word? { store.active.first { $0.id == selection } }
 
     public var body: some View {
         NavigationSplitView {
-            List(store.words, selection: $selection) { word in
+            List(store.active, selection: $selection) { word in
                 row(word)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button("Archive", systemImage: "archivebox") {
+                            if selection == word.id { selection = nil }
+                            Task { await store.archive(word) }
+                        }
+                    }
             }
             .overlay {
-                if store.loaded && store.words.isEmpty {
+                if store.loaded && store.active.isEmpty {
                     ContentUnavailableView("No words yet", systemImage: "character.book.closed")
                 }
             }
@@ -35,18 +41,6 @@ public struct WordsView: View {
         }
         .onChange(of: selection) {
             if let word = selected { Task { await store.markSeen(word) } }
-        }
-        .confirmationDialog(
-            "Delete \(deleting?.word ?? "")?",
-            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
-            presenting: deleting
-        ) { word in
-            Button("Delete", role: .destructive) {
-                selection = nil
-                Task { await store.delete(word) }
-            }
-        } message: { _ in
-            Text("It leaves your reviews on every device.")
         }
     }
 
@@ -84,9 +78,6 @@ public struct WordsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(Theme.background)
-        .toolbar {
-            Button("Delete", systemImage: "trash", role: .destructive) { deleting = word }
-        }
     }
 
     private func schedule(_ word: Word) -> String {

@@ -45,8 +45,14 @@ public struct PreciseAPI: Sendable {
         try await send("POST", "words/\(id)/seen", as: WordBody.self).word
     }
 
-    public func delete(_ id: Int) async throws {
-        _ = try await request("DELETE", "words/\(id)", body: nil)
+    /// Takes the word out of review for good; it stays saved, so it is never suggested again.
+    public func archive(_ id: Int) async throws -> Word {
+        try await send("POST", "words/\(id)/archive", as: WordBody.self).word
+    }
+
+    /// Puts an archived word back into review where it left off.
+    public func restore(_ id: Int) async throws -> Word {
+        try await send("POST", "words/\(id)/restore", as: WordBody.self).word
     }
 
     private struct WordBody: Decodable { let word: Word }

@@ -16,7 +16,7 @@ Precise EN: learn the English words you could have used in your own prompts. A p
 - `./build.sh`: `build/Precise EN.app` and `build/precise-en`. `./install.sh`: replaces `/Applications/Precise EN.app`, launches it, and installs the CLI to `~/.local/bin/precise-en`. `./install-iphone.sh`: builds and installs the iPhone app on the paired iPhone.
 - `cd worker && npm run deploy`: applies D1 migrations and deploys the Worker.
 - `apps/configure.sh`: writes `apps/Secrets.xcconfig` and generates `apps/PreciseEN.xcodeproj` for opening in Xcode. Both are git-ignored.
-- `echo "<prompt>" | .build/debug/precise-en suggest`: one capture, synchronously, printing what happened. It saves a real word: delete test words afterwards.
+- `echo "<prompt>" | .build/debug/precise-en suggest`: one capture, synchronously, printing what happened. It saves a real word (words are archived rather than deleted through the API, so remove test rows from D1 directly afterwards).
 
 ## Important Details
 
@@ -35,6 +35,7 @@ Read these before changing the area they cover, and write a new one whenever a d
 - Prompts arrive through a UserPromptSubmit hook that uses tmux-agent-plane's background agent; there is no skill: `docs/adr/2026-11-15-prompts-reach-precise-en-through-a-hook.md`
 - One D1 word list behind the Worker holds words and review state for every device, and the Worker owns the schedule: `docs/adr/2026-11-15-one-word-list-in-d1-behind-a-worker.md`
 - Cards show the word and ask for its meaning: `docs/adr/2026-11-15-cards-ask-for-the-meaning.md`
+- Known words are archived rather than deleted, and difficulty is judged at capture: `docs/adr/2026-11-15-known-words-are-archived-and-judged-at-capture.md`
 
 ## Changelog and Releases
 

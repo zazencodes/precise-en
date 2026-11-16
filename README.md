@@ -2,7 +2,7 @@
 
 Learn the English words you could have used in your own prompts.
 
-When you send Claude Code or Codex a long prompt, Precise EN asks a cheap background model for the one word that would have said part of it better, such as **idempotent** for *make sure running it twice doesn't break anything*. It saves the word with its definition, your phrase and a tighter rewrite of the prompt. A Mac menu bar app shows how many new words have arrived and reviews them with spaced repetition, Anki-style. An iPhone app reviews the same words.
+When you send Claude Code or Codex a long prompt, Precise EN asks a cheap background model for the one word that would have said part of it better, such as **idempotent** for *make sure running it twice doesn't break anything*. It saves the word with its definition, difficulty (`common`, `advanced` or `rare`), your phrase and a tighter rewrite of the prompt. A Mac menu bar app shows how many new words have arrived and reviews them with spaced repetition, Anki-style. An iPhone app reviews the same words.
 
 ## How it works
 
@@ -13,8 +13,8 @@ prompt ──▶ UserPromptSubmit hook ──▶ precise-en suggest (detached)
                      Cloudflare Worker + D1 ◀── Mac app (menu bar) and iPhone app
 ```
 
-- **Hook.** `precise-en hook` returns at once, so your agent never waits. Prompts under 50 words are skipped. Longer ones go to `precise-en suggest`, which runs the background agent you chose in [tmux-agent-plane](https://github.com/zazencodes/tmux-agent-plane) (`o` → Configure), checks its answer and saves the word. It refuses a word already in the prompt, a phrase you didn't write, and any word you have already saved.
-- **Worker.** One D1 table holds every word and its review state. The Worker requires a bearer token and schedules reviews, so the Mac and the iPhone stay in step.
+- **Hook.** `precise-en hook` returns at once, so your agent never waits. Prompts under 50 words are skipped. Longer ones go to `precise-en suggest`, which runs the background agent you chose in [tmux-agent-plane](https://github.com/zazencodes/tmux-agent-plane) (`o` → Configure), checks its answer (including a valid `difficulty`) and saves the word. It refuses a word already in the prompt, a phrase you didn't write, and any word you have already saved—including words you archived as known.
+- **Worker.** One D1 table holds every word, its difficulty and its review state, including archived words so they are never suggested again. The Worker requires a bearer token, schedules reviews, and archives or restores words, so the Mac and the iPhone stay in step.
 - **Apps.** Review shows each due word; Space reveals the meaning and 1 to 4 rate it. Words lists everything, with a purple dot on each new word until you open it.
 
 ## Setup

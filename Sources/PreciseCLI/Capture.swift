@@ -33,17 +33,21 @@ enum Capture {
         educated writer knows but rarely reaches for (like terse, idempotent, verbatim, canonical, \
         orthogonal, distill). No proper nouns, acronyms or names of tools and libraries.
         - Write the word in lowercase, in its dictionary form.
-        - The word must not appear anywhere in the prompt, and must not be one of their saved words.
+        - The word must not appear anywhere in the prompt, and must not be one of their saved words \
+        below (which include words they already know and archived).
         - "phrase" is their own wording that the word replaces, copied exactly from the prompt: a \
         few words, at most one sentence.
         - "rewrite" restates the prompt's main request in one or two concise sentences that use the \
         word.
         - "definition" is a one-sentence dictionary definition of the word in the sense you mean.
         - "part_of_speech" is noun, verb, adjective or adverb.
+        - "difficulty" is common (an everyday word most writers use without thinking: relocate, \
+        delegate), advanced (educated writers know it but rarely reach for it: superfluous, \
+        idempotent) or rare (few people know or use it: perspicacious).
         - Ignore code, logs and other pasted material: judge only their own writing.
 
         Answer with only a JSON object, no Markdown and no other text:
-        {"word": "idempotent", "part_of_speech": "adjective", "definition": "...", "phrase": "...", "rewrite": "..."}
+        {"word": "idempotent", "part_of_speech": "adjective", "difficulty": "advanced", "definition": "...", "phrase": "...", "rewrite": "..."}
         or
         {"word": null}
 
@@ -82,9 +86,14 @@ enum Capture {
             }
             return string
         }
+        let difficulty = try field("difficulty")
+        guard let level = Difficulty(rawValue: difficulty) else {
+            throw ContractError(message: "background agent's \"difficulty\" is not common, advanced or rare: \(difficulty)")
+        }
         return .word(NewWord(
             word: try field("word"),
             partOfSpeech: try field("part_of_speech"),
+            difficulty: level,
             definition: try field("definition"),
             phrase: try field("phrase"),
             rewrite: try field("rewrite")

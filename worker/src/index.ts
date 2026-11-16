@@ -10,6 +10,7 @@ interface WordRow {
   id: number;
   word: string;
   part_of_speech: string;
+  difficulty: Difficulty;
   definition: string;
   phrase: string;
   rewrite: string;
@@ -21,9 +22,12 @@ interface WordRow {
   reps: number;
   lapses: number;
   reviewed_at: string | null;
+  archived_at: string | null;
 }
 
 const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb"];
+const DIFFICULTIES = ["common", "advanced", "rare"] as const;
+type Difficulty = (typeof DIFFICULTIES)[number];
 const WORD = /^[a-z]+(-[a-z]+)*$/;
 
 class HttpError extends Error {
@@ -66,12 +70,19 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (request.method === "GET") return listWords(env);
     if (request.method === "POST") return addWord(request, env);
   }
-  const match = path.match(/^\/words\/(\d+)(\/review|\/seen)?$/);
-  if (match) {
+  const match = path.match(/^\/words\/(\d+)\/(review|seen|archive|restore)$/);
+  if (match && request.method === "POST") {
     const id = Number(match[1]);
-    if (match[2] === "/review" && request.method === "POST") return reviewWord(id, request, env);
-    if (match[2] === "/seen" && request.method === "POST") return markSeen(id, env);
-    if (match[2] === undefined && request.method === "DELETE") return deleteWord(id, env);
+    switch (match[2]) {
+      case "review":
+        return reviewWord(id, request, env);
+      case "seen":
+        return markSeen(id, env);
+      case "archive":
+        return archiveWord(id, env);
+      case "restore":
+        return restoreWord(id, env);
+    }
   }
   throw new HttpError(404, `no route for ${request.method} ${path}`);
 }
@@ -91,17 +102,22 @@ async function addWord(request: Request, env: Env): Promise<Response> {
   if (!PARTS_OF_SPEECH.includes(partOfSpeech)) {
     throw new HttpError(400, `part_of_speech must be one of ${PARTS_OF_SPEECH.join(", ")}`);
   }
+  const difficulty = text(body, "difficulty", 20);
+  if (!DIFFICULTIES.includes(difficulty as Difficulty)) {
+    throw new HttpError(400, `difficulty must be one of ${DIFFICULTIES.join(", ")}`);
+  }
   const now = timestamp(new Date());
   const row = await env.DB.prepare(
-    `INSERT INTO words (word, part_of_speech, definition, phrase, rewrite, created_at, due_at,
+    `INSERT INTO words (word, part_of_speech, difficulty, definition, phrase, rewrite, created_at, due_at,
        interval_days, ease, reps, lapses)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT (word) DO NOTHING
      RETURNING *`,
   )
     .bind(
       word,
       partOfSpeech,
+      difficulty,
       text(body, "definition", 400),
       text(body, "phrase", 400),
       text(body, "rewrite", 600),
@@ -124,8 +140,12 @@ async function reviewWord(id: number, request: Request, env: Env): Promise<Respo
   if (!RATINGS.includes(rating as Rating)) {
     throw new HttpError(400, `rating must be one of ${RATINGS.join(", ")}`);
   }
+  const existing = await find(id, env);
+  if (existing.archived_at !== null) {
+    throw new HttpError(409, `${existing.word} is archived; restore it to review`);
+  }
   const now = new Date();
-  const next = review(await find(id, env), rating as Rating, now);
+  const next = review(existing, rating as Rating, now);
   const row = await env.DB.prepare(
     `UPDATE words SET due_at = ?, interval_days = ?, ease = ?, reps = ?, lapses = ?, reviewed_at = ?,
        seen_at = COALESCE(seen_at, ?)
@@ -144,10 +164,20 @@ async function markSeen(id: number, env: Env): Promise<Response> {
   return Response.json({ word: row });
 }
 
-async function deleteWord(id: number, env: Env): Promise<Response> {
+async function archiveWord(id: number, env: Env): Promise<Response> {
   await find(id, env);
-  await env.DB.prepare("DELETE FROM words WHERE id = ?").bind(id).run();
-  return new Response(null, { status: 204 });
+  const row = await env.DB.prepare("UPDATE words SET archived_at = COALESCE(archived_at, ?) WHERE id = ? RETURNING *")
+    .bind(timestamp(new Date()), id)
+    .first<WordRow>();
+  return Response.json({ word: row });
+}
+
+async function restoreWord(id: number, env: Env): Promise<Response> {
+  await find(id, env);
+  const row = await env.DB.prepare("UPDATE words SET archived_at = NULL WHERE id = ? RETURNING *")
+    .bind(id)
+    .first<WordRow>();
+  return Response.json({ word: row });
 }
 
 async function find(id: number, env: Env): Promise<WordRow> {
