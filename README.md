@@ -1,8 +1,8 @@
-# Precise EN
+# precise//en
 
 Learn the English words you could have used in your own prompts.
 
-When you send Claude Code or Codex a long prompt, Precise EN asks a cheap background model for the one word that would have said part of it better, such as **idempotent** for *make sure running it twice doesn't break anything*. It saves the word with its definition, difficulty (`common`, `advanced` or `rare`), your phrase and a tighter rewrite of the prompt. A Mac menu bar app shows how many new words have arrived and reviews them with spaced repetition, Anki-style. An iPhone app reviews the same words.
+When you send Claude Code or Codex a long prompt, precise//en asks a cheap background model for the one word that would have said part of it better, such as **idempotent** for *make sure running it twice doesn't break anything*. It saves the word with its definition, difficulty (`common`, `advanced` or `rare`), your phrase and a tighter rewrite of the prompt. A Mac menu bar app shows how many new words have arrived and reviews them with spaced repetition, Anki-style. An iPhone app reviews the same words.
 
 ## How it works
 
@@ -40,7 +40,7 @@ Requires macOS 15, Xcode, [xcodegen](https://github.com/yonaskolb/XcodeGen), Nod
      | npx wrangler secret put TOKEN
    ```
 
-3. **Install.** `./install.sh` builds the Mac app into `/Applications`, adds it to Login Items and installs `precise-en` in `~/.local/bin`. `./install-iphone.sh` installs the iPhone app on your paired, unlocked iPhone.
+3. **Install.** `./install.sh` builds the Mac app into `/Applications/precise::en.app` (shown as precise//en in Finder), adds it to Login Items and installs `precise-en` in `~/.local/bin`. `./install-iphone.sh` installs the iPhone app on your paired, unlocked iPhone.
 4. **Add the hook** to `UserPromptSubmit` in `~/.claude/settings.json` and `~/.codex/hooks.json`:
 
    ```json

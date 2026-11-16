@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Precise EN are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
+All notable changes to precise//en are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
@@ -17,6 +17,8 @@ All notable changes to Precise EN are documented here. The format follows [Keep 
 
 ### Changed
 
+- Renamed the apps to precise//en, all lowercase, on the iPhone home screen and throughout the Mac app, including Finder, Spotlight and Launchpad.
+- Moved the Mac app to /Applications/precise::en.app, a file name Finder shows as precise//en.
 - Redesigned the app in dark grays and heavy type: the review card sets the word large across the screen, Show Answer is a white button, and the brand pink stays on the word in its rewrite and the new-word dot.
 - Moved the due count to the top of Review and showed new words by their pink dot, in place of tab bar badges.
 - Showed the 1 to 4 key hints on the rating buttons only on the Mac.

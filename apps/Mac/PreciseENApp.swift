@@ -37,7 +37,7 @@ struct PreciseENApp: App {
                 .environment(store)
                 .environment(capture)
         }
-        Window("Precise EN", id: MainWindow.id) {
+        Window("precise//en", id: MainWindow.id) {
             MainView(tab: $tab)
                 .environment(store)
                 .frame(minWidth: 680, minHeight: 520)
@@ -79,7 +79,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             try SMAppService.mainApp.register()
         } catch {
             let alert = NSAlert(error: error)
-            alert.messageText = "Precise EN couldn't add itself to Login Items"
+            alert.messageText = "precise//en couldn't add itself to Login Items"
             alert.runModal()
         }
     }
@@ -148,7 +148,7 @@ struct MenuContent: View {
             Button("Open Capture Log") { NSWorkspace.shared.open(CaptureStatus.logURL) }
         }
         Divider()
-        Button("Quit Precise EN") { NSApp.terminate(nil) }
+        Button("Quit precise//en") { NSApp.terminate(nil) }
             .keyboardShortcut("q")
     }
 

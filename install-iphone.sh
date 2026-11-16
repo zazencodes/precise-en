@@ -27,4 +27,4 @@ rm "$devices"
 xcodebuild -project apps/PreciseEN.xcodeproj -scheme PreciseENiOS -configuration Release \
     -destination "generic/platform=iOS" -derivedDataPath build/DerivedData -allowProvisioningUpdates -quiet build
 xcrun devicectl device install app --device "$device" "build/DerivedData/Build/Products/Release-iphoneos/Precise EN.app"
-echo "Installed Precise EN on the iPhone"
+echo "Installed precise//en on the iPhone"
