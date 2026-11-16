@@ -29,6 +29,13 @@ public struct Word: Codable, Identifiable, Hashable, Sendable {
     public var isArchived: Bool { archivedAt != nil }
 
     public func isDue(at now: Date) -> Bool { !isArchived && dueAt <= now }
+
+    /// Where the word is in review, by Anki's names.
+    public var tier: Tier {
+        if reviewedAt == nil { return .new }
+        if intervalDays == 0 { return .learning }
+        return intervalDays < Tier.matureDays ? .young : .mature
+    }
 }
 
 /// How hard the word is, judged by the background agent when it suggests the word.
@@ -39,6 +46,16 @@ public enum Difficulty: String, Codable, CaseIterable, Sendable {
     case advanced
     /// A word few people know or use: perspicacious, anfractuous.
     case rare
+
+    public var title: String { rawValue.capitalized }
+}
+
+/// Anki's stages of a card: never reviewed, relearning after Again, then young and mature by interval.
+public enum Tier: String, CaseIterable, Sendable {
+    case new, learning, young, mature
+
+    /// Anki calls a card mature once its interval reaches 21 days.
+    public static let matureDays = 21
 
     public var title: String { rawValue.capitalized }
 }

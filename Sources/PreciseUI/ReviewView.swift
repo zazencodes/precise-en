@@ -4,153 +4,194 @@ import SwiftUI
 /// One due word at a time: recall what it means, show the answer, then rate how well you knew it.
 public struct ReviewView: View {
     @Environment(WordStore.self) private var store
-    @State private var revealed = false
-    @State private var rating = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ScaledMetric(relativeTo: .largeTitle) private var wordSize = TypeScale.displaySize
+    /// The word whose answer is showing. Keyed by word so the next card never opens revealed.
+    @State private var revealedID: Word.ID?
+    /// Words rated here whose rating the API has not confirmed yet. The next card shows at once;
+    /// if the rating fails, the word comes back to the front and the failure bar says why.
+    @State private var rated: Set<Word.ID> = []
 
     public init() {}
 
+    private var queue: [Word] {
+        store.due.filter { !rated.contains($0.id) }
+    }
+
     public var body: some View {
-        Group {
-            if let word = store.due.first {
-                card(word)
-                    .id(word.id)
-            } else {
-                caughtUp
+        let word = queue.first
+        VStack(spacing: 0) {
+            header
+            ZStack {
+                if let word {
+                    card(word)
+                        .id(word.id)
+                        .transition(cardTransition)
+                } else {
+                    emptyState
+                        .transition(.opacity)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if let word {
+                actions(word)
             }
         }
+        .frame(maxWidth: 640)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Theme.background)
-        .onChange(of: store.due.first?.id) { revealed = false }
+        .background(Theme.canvas)
+    }
+
+    private var header: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Wordmark()
+            Spacer()
+            if store.loaded {
+                Text("\(queue.count) due")
+                    .font(TypeScale.headerDetail)
+                    .foregroundStyle(queue.isEmpty ? Theme.tertiary : .white)
+                    .contentTransition(.numericText())
+                    .animation(.snappy, value: queue.count)
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 12)
+        .padding(.bottom, 4)
     }
 
     private func card(_ word: Word) -> some View {
-        VStack(spacing: 0) {
-            Text("\(store.due.count) due")
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
-                .padding(.top, 20)
-            Spacer(minLength: 24)
-            Text(word.word)
-                .font(.system(size: 44, weight: .semibold))
-                .multilineTextAlignment(.center)
-                .textSelection(.enabled)
-            if revealed {
-                WordAnswer(word: word)
-                    .padding(.top, 28)
-                    .transition(.opacity)
-            }
-            Spacer(minLength: 24)
-            if revealed {
-                ratingButtons(word)
-            } else {
-                Button("Show Answer") { withAnimation(.easeOut(duration: 0.15)) { revealed = true } }
-                    .keyboardShortcut(.space, modifiers: [])
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-            }
-        }
-        .padding(.horizontal, 28)
-        .padding(.bottom, 28)
-        .frame(maxWidth: 560)
-    }
-
-    private func ratingButtons(_ word: Word) -> some View {
-        HStack(spacing: 10) {
-            ForEach(Array(Rating.allCases.enumerated()), id: \.element) { index, choice in
-                Button {
-                    rating = true
-                    Task {
-                        await store.review(word, choice)
-                        rating = false
+        let revealed = revealedID == word.id
+        return GeometryReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(word.word)
+                        .display(size: wordSize)
+                        .textSelection(.enabled)
+                    if revealed {
+                        WordAnswer(word: word)
+                            .padding(.top, 20)
+                            .transition(reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 16)))
                     }
-                } label: {
-                    VStack(spacing: 2) {
-                        Text(choice.title)
-                        Text("\(index + 1)").font(.caption2).foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 24)
+                .padding(.vertical, 20)
+                // The front sits a little above the middle, where the eye lands; the answer reads from the top.
+                .padding(.bottom, revealed ? 0 : proxy.size.height * 0.12)
+                .frame(maxWidth: .infinity, minHeight: proxy.size.height, alignment: revealed ? .topLeading : .leading)
+            }
+            .scrollIndicators(.hidden)
+            .scrollBounceBehavior(.basedOnSize)
+        }
+    }
+
+    private func actions(_ word: Word) -> some View {
+        Group {
+            if revealedID == word.id {
+                HStack(spacing: 8) {
+                    ForEach(Array(Rating.allCases.enumerated()), id: \.element) { index, rating in
+                        Button {
+                            rate(word, rating)
+                        } label: {
+                            VStack(spacing: 1) {
+                                Text(rating.title)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                                #if os(macOS)
+                                Text("\(index + 1)")
+                                    .font(.caption.monospacedDigit())
+                                    .foregroundStyle(Theme.tertiary)
+                                #endif
+                            }
+                        }
+                        .buttonStyle(.secondaryAction)
+                        .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: [])
                     }
-                    .frame(maxWidth: .infinity)
                 }
-                .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: [])
-                .buttonStyle(.bordered)
-                .tint(choice == .again ? Theme.failure : Theme.purple)
-                .controlSize(.large)
-            }
-        }
-        .disabled(rating)
-    }
-
-    private var caughtUp: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "checkmark.circle")
-                .font(.system(size: 40))
-                .foregroundStyle(Theme.purple)
-            if !store.loaded {
-                Text("Loading…")
-            } else if store.words.isEmpty {
-                Text("No words yet")
-                    .font(.title3.weight(.semibold))
-                Text("Write a long prompt to Claude Code or Codex, and the word you could have used appears here.")
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
+                .transition(.opacity)
             } else {
-                Text("All caught up")
-                    .font(.title3.weight(.semibold))
-                if let next = store.nextDue {
-                    Text("Next review \(next.formatted(.relative(presentation: .named)))")
-                        .foregroundStyle(.secondary)
+                Button("Show Answer") {
+                    withAnimation(motion) { revealedID = word.id }
                 }
+                .buttonStyle(.primaryAction)
+                .keyboardShortcut(.space, modifiers: [])
+                .transition(.opacity)
             }
         }
-        .padding(32)
-        .frame(maxWidth: 420)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 16)
     }
-}
 
-/// The back of a card, and the body of a word's page: its meaning and the prompt it came from.
-struct WordAnswer: View {
-    let word: Word
+    private func rate(_ word: Word, _ rating: Rating) {
+        withAnimation(motion) { _ = rated.insert(word.id) }
+        Task {
+            await store.review(word, rating)
+            rated.remove(word.id)
+        }
+    }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(word.partOfSpeech)
-                    .font(.callout.italic())
-                    .foregroundStyle(Theme.purple)
-                Text(word.definition)
-                    .font(.title3)
+    private var motion: Animation {
+        reduceMotion ? .easeOut(duration: 0.2) : .snappy(duration: 0.35)
+    }
+
+    /// The rated word slides away to the left as the next one arrives from the right.
+    private var cardTransition: AnyTransition {
+        if reduceMotion { return .opacity }
+        return .asymmetric(
+            insertion: .opacity.combined(with: .offset(x: 40)),
+            removal: .opacity.combined(with: .offset(x: -40))
+        )
+    }
+
+    @ViewBuilder
+    private var emptyState: some View {
+        if !store.loaded {
+            if store.error == nil {
+                ProgressView()
+            } else {
+                message("Words didn't load.", detail: nil)
             }
-            section("You wrote") {
-                Text("“\(word.phrase)”")
-                    .foregroundStyle(.secondary)
-            }
-            section("Precisely") {
-                Text(emphasized(word.rewrite, word: word.word))
+        } else if store.words.isEmpty {
+            message(
+                "No words yet.",
+                detail: "Write a long prompt to Claude Code or Codex. The word you could have used lands here."
+            )
+        } else if store.active.isEmpty {
+            message("Nothing to review.", detail: "Every word is archived. Restore one from Words.")
+        } else {
+            message(
+                "All caught up.",
+                detail: store.nextDue.map { "Next review \($0.formatted(.relative(presentation: .named)))." }
+            )
+        }
+    }
+
+    private func message(_ title: String, detail: String?) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.system(size: wordSize * 0.72, weight: .heavy))
+                .tracking(-wordSize * 0.72 * 0.025)
+                .foregroundStyle(.white)
+            if let detail {
+                Text(detail)
+                    .font(TypeScale.reading)
+                    .foregroundStyle(Theme.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .textSelection(.enabled)
+        .padding(.horizontal, 24)
+        .padding(.bottom, 80)
     }
+}
 
-    private func section(_ title: String, @ViewBuilder content: () -> some View) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title.uppercased())
-                .font(.caption2.weight(.semibold))
-                .tracking(1)
-                .foregroundStyle(.tertiary)
-            content()
-        }
-    }
-
-    /// The rewrite with the word in bold purple, in any form: synchronize, synchronizing, synchronized.
-    private func emphasized(_ text: String, word: String) -> AttributedString {
-        var result = AttributedString(text)
-        for range in WordForms.ranges(of: word, in: text) {
-            guard let start = AttributedString.Index(range.lowerBound, within: result),
-                  let end = AttributedString.Index(range.upperBound, within: result)
-            else { continue }
-            result[start..<end].font = .body.weight(.semibold)
-            result[start..<end].foregroundColor = Theme.purple
-        }
-        return result
+/// "precise//en" in bold, the slashes dimmed, at the top of Review.
+struct Wordmark: View {
+    var body: some View {
+        Text("precise\(Text("//").foregroundStyle(Theme.tertiary))en")
+            .font(TypeScale.header)
+            .tracking(-0.3)
+            .foregroundStyle(.white)
+            .accessibilityLabel("precise//en")
     }
 }

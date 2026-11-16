@@ -19,6 +19,8 @@ settings:
     GENERATE_INFOPLIST_FILE: YES
     INFOPLIST_KEY_CFBundleDisplayName: Precise EN
     ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    # Dark gray, so the Mac's selected rows and focus rings stay out of the system blue.
+    ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
     ENABLE_USER_SCRIPT_SANDBOXING: YES
 targets:
   PreciseENMac:

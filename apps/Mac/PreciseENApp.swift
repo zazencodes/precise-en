@@ -40,10 +40,12 @@ struct PreciseENApp: App {
         Window("Precise EN", id: MainWindow.id) {
             MainView(tab: $tab)
                 .environment(store)
-                .frame(minWidth: 640, minHeight: 480)
+                .frame(minWidth: 680, minHeight: 520)
+                .containerBackground(Theme.canvas, for: .window)
+                .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
                 .task { await store.refresh() }
         }
-        .defaultSize(width: 780, height: 580)
+        .defaultSize(width: 900, height: 640)
         .defaultLaunchBehavior(.suppressed)
     }
 }
@@ -133,11 +135,11 @@ struct MenuContent: View {
     @Binding var tab: AppTab
 
     var body: some View {
-        Button(store.due.isEmpty ? "Review" : "Review \(store.due.count) Due") { show(.review) }
-        Button(store.newWords.isEmpty ? "Words" : "Words (\(store.newWords.count) New)") { show(.words) }
+        Button(store.due.isEmpty ? "Review" : "Review · \(store.due.count) due") { show(.review) }
+        Button(store.newWords.isEmpty ? "Words" : "Words · \(store.newWords.count) new") { show(.words) }
         if let error = store.error {
             Divider()
-            Text("API failed: \(error.prefix(90))")
+            Text("Last request failed: \(error.prefix(90))")
         }
         if let failure = capture.failure {
             Divider()

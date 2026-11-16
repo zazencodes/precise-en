@@ -16,6 +16,7 @@ import Testing
     #expect(word.difficulty == .advanced)
     #expect(word.isNew)
     #expect(!word.isArchived)
+    #expect(word.tier == .young)
     #expect(!word.isDue(at: Date(timeIntervalSince1970: 1_794_000_000)))
     #expect(word.isDue(at: word.dueAt))
 
