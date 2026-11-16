@@ -47,7 +47,7 @@ Requires macOS 15, Xcode, [xcodegen](https://github.com/yonaskolb/XcodeGen), Nod
    { "hooks": [{ "type": "command", "command": "/Users/<you>/.local/bin/precise-en hook" }] }
    ```
 
-   Codex runs a new hook only after you trust it: run `/hooks` in Codex.
+   Codex runs a new hook only after you trust it. Start Codex (it opens with "Hooks need review"; choose Review hooks) or run `/hooks`, select `UserPromptSubmit`, press Enter, select the `precise-en hook` entry and press `t`. Codex saves the trust in `~/.codex/config.toml` and asks again if the hook's entry changes.
 
 ## Troubleshooting
 

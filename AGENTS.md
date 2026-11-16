@@ -22,6 +22,7 @@ Precise EN: learn the English words you could have used in your own prompts. A p
 
 - The scripts use Xcode through `DEVELOPER_DIR`; `xcode-select` points at the Command Line Tools on this Mac. Set `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` for `swift` and `xcodebuild` yourself.
 - `~/.config/precise-en/config.json` (`url`, `token`, `apple_team_id`, `bundle_id`, mode 600) is the one source of the API URL and token and of the Apple team and bundle ID the apps are signed with. The token is the Worker secret `TOKEN`; never print it or commit it.
+- The hook is installed outside this repo, as a `UserPromptSubmit` entry running `~/.local/bin/precise-en hook` in `~/.claude/settings.json` and in `~/.codex/hooks.json`. Codex runs it only once it is trusted in `/hooks`, which records a hash in `~/.codex/config.toml`; editing the entry needs trusting again.
 - The hook must print nothing (Claude Code adds hook output to the conversation) and never exit 2 (that blocks the prompt). Everything `suggest` runs carries `PRECISE_EN_CAPTURE`, and the hook ignores prompts in that environment, so a background agent with hooks of its own cannot feed captures back in.
 - `suggest` appends one line per prompt to `~/.local/state/precise-en/capture.log` and writes the latest result to `last-capture.json`; the Mac app turns its menu bar icon into a warning when that result is `failed`.
 - The Mac app registers itself as a login item only when it runs from `/Applications`. Ice may hide its menu bar item when it first appears.
