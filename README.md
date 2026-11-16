@@ -16,7 +16,7 @@
 
 Learn the English words you could have used in your own prompts.
 
-When you send Claude Code or Codex a long prompt, precise//en asks a cheap background model for the one word that would have said part of it better, such as **idempotent** for *make sure running it twice doesn't break anything*. It saves the word with its definition, difficulty (`common`, `advanced` or `rare`), your phrase and a tighter rewrite of the prompt. A Mac menu bar app shows how many new words have arrived and reviews them with spaced repetition, Anki-style. An iPhone app reviews the same words.
+When you send Claude Code or Codex a long prompt, precise//en asks a cheap background model for the one word that would have said part of it better, such as **idempotent** for *make sure running it twice doesn't break anything*. It saves the word with its definition, difficulty (`common`, `advanced` or `rare`), your phrase and a tighter rewrite of the prompt. A Mac menu bar app shows when new words have arrived and reviews them with spaced repetition, Anki-style. An iPhone app reviews the same words.
 
 <p align="center">
   <img src="docs/assets/mac-review.png" alt="The Mac app's Review window: one word set large, with Show Answer below it" width="100%">
@@ -49,7 +49,7 @@ prompt ──▶ UserPromptSubmit hook ──▶ precise-en suggest (detached)
 
 - **Hook.** `precise-en hook` returns at once. Prompts under 50 words are skipped. Longer ones go to `precise-en suggest`, which runs the background agent you chose in [tmux-agent-plane](https://github.com/zazencodes/tmux-agent-plane) (`o` → Configure), checks its answer (including a valid `difficulty`) and saves the word. It refuses a word already in the prompt, a phrase you didn't write, and any word you have already saved, including words you archived as known.
 - **Worker.** One D1 table holds every word, its difficulty and its review state, including archived words so they are never suggested again. The Worker requires a bearer token, schedules reviews, and archives or restores words.
-- **Apps.** The Mac app lives in the menu bar: it counts new words, opens at login and opens one window with Review, Words and Stats. The iPhone app has the same three screens.
+- **Apps.** The Mac app lives in the menu bar: its book icon fills in while there are new words, it opens at login and opens one window with Review, Words and Stats. The iPhone app has the same three screens.
 
 **What leaves your Mac.** Prompts of 50 words or more (up to 20,000 characters) go to the background agent's model, through that CLI's own login. Each saved word keeps your phrase, a quote from your prompt, and the rewrite, in your own D1 database. The apps have your Worker's URL and token built in, so keep your builds to yourself.
 
@@ -129,7 +129,7 @@ tmux-agent-plane background "Reply with one word: ready"
 
 Codex runs a new hook only after you trust it. Start Codex (it opens with "Hooks need review"; choose Review hooks) or run `/hooks`, select `UserPromptSubmit`, press Enter, select the `precise-en hook` entry and press `t`. Codex saves the trust in `~/.codex/config.toml` and asks again if the hook's entry changes.
 
-Now write a long prompt. Within a minute or so, the menu bar counts one new word.
+Now write a long prompt. Within a minute or so, the book in the menu bar fills in for a new word.
 
 ## Troubleshooting
 

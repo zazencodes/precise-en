@@ -4,7 +4,7 @@ import PreciseUI
 import ServiceManagement
 import SwiftUI
 
-/// The Mac app: a menu bar item that counts new words, and a window to review and browse them.
+/// The Mac app: a menu bar item that fills in while there are new words, and a window to review and browse them.
 /// It opens at login and checks the API every minute.
 @main
 struct PreciseENApp: App {
@@ -109,14 +109,14 @@ struct MenuBarLabel: View {
     let openMain: (@escaping () -> Void) -> Void
 
     var body: some View {
-        let count = store.newWords.count
         Group {
             if capture.failure != nil || store.error != nil {
                 Image(systemName: "exclamationmark.triangle")
-            } else if count > 0 {
-                Text("\(Image(systemName: "character.book.closed.fill")) \(count)")
-            } else {
+            } else if store.newWords.isEmpty {
                 Image(systemName: "character.book.closed")
+            } else {
+                // Filled until every new word has been opened in Words.
+                Image(systemName: "character.book.closed.fill")
             }
         }
         .onAppear {
