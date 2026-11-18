@@ -70,6 +70,20 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (request.method === "GET") return listWords(env);
     if (request.method === "POST") return addWord(request, env);
   }
+  if (path === "/capture-limits" && request.method === "GET") {
+    const { results } = await env.DB.prepare("SELECT * FROM daily_capture").all();
+    return Response.json({ limits: results });
+  }
+  const limitMatch = path.match(/^\/capture-limits\/(common|advanced|rare)$/);
+  if (limitMatch && request.method === "PUT") {
+    const limit = (await json(request)).daily_limit;
+    if (typeof limit !== "number" || !Number.isInteger(limit) || limit < 0 || limit > 99) {
+      throw new HttpError(400, "daily_limit must be an integer from 0 to 99");
+    }
+    await env.DB.prepare("UPDATE capture_limits SET daily_limit = ? WHERE difficulty = ?")
+      .bind(limit, limitMatch[1]).run();
+    return new Response(null, { status: 204 });
+  }
   const match = path.match(/^\/words\/(\d+)\/(review|seen|archive|restore)$/);
   if (match && request.method === "POST") {
     const id = Number(match[1]);
@@ -106,11 +120,11 @@ async function addWord(request: Request, env: Env): Promise<Response> {
   if (!DIFFICULTIES.includes(difficulty as Difficulty)) {
     throw new HttpError(400, `difficulty must be one of ${DIFFICULTIES.join(", ")}`);
   }
-  const now = timestamp(new Date());
   const row = await env.DB.prepare(
     `INSERT INTO words (word, part_of_speech, difficulty, definition, phrase, rewrite, created_at, due_at,
        interval_days, ease, reps, lapses)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     SELECT ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%SZ','now'), strftime('%Y-%m-%dT%H:%M:%SZ','now'), ?, ?, ?, ?
+     FROM daily_capture WHERE difficulty = ? AND captured_today < daily_limit
      ON CONFLICT (word) DO NOTHING
      RETURNING *`,
   )
@@ -121,16 +135,18 @@ async function addWord(request: Request, env: Env): Promise<Response> {
       text(body, "definition", 400),
       text(body, "phrase", 400),
       text(body, "rewrite", 600),
-      now,
-      now,
       NEW_CARD.interval_days,
       NEW_CARD.ease,
       NEW_CARD.reps,
       NEW_CARD.lapses,
+      difficulty,
     )
     .first<WordRow>();
   if (!row) {
-    throw new HttpError(409, `${word} is already saved`);
+    if (await env.DB.prepare("SELECT id FROM words WHERE word = ?").bind(word).first()) {
+      throw new HttpError(409, `${word} is already saved`);
+    }
+    throw new HttpError(429, `daily limit reached for ${difficulty} words`);
   }
   return Response.json({ word: row }, { status: 201 });
 }

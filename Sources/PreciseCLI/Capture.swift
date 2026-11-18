@@ -17,7 +17,7 @@ enum Capture {
         wordCount(prompt) >= minimumWords
     }
 
-    static func agentPrompt(for prompt: String, saved: [String]) -> String {
+    static func agentPrompt(for prompt: String, saved: [String], available: [Difficulty]) -> String {
         """
         You coach a software engineer's English vocabulary. They write long prompts to AI coding \
         agents. Read their prompt below and find the one English word that would most improve it: a \
@@ -44,6 +44,9 @@ enum Capture {
         - "difficulty" is common (an everyday word most writers use without thinking: relocate, \
         delegate), advanced (educated writers know it but rarely reach for it: superfluous, \
         idempotent) or rare (few people know or use it: perspicacious).
+        - Available difficulties today: \(available.map(\.rawValue).joined(separator: ", ")). Only suggest a word \
+        that fits one of these difficulties. Keep its true difficulty and answer {"word": null} \
+        if there is no good fit.
         - Ignore code, logs and other pasted material: judge only their own writing.
 
         Answer with only a JSON object, no Markdown and no other text:

@@ -35,6 +35,7 @@ When you send Claude Code or Codex a long prompt, precise//en asks a cheap backg
 ## Features
 
 - **Words from your own writing.** Every prompt of 50 words or more is a chance to learn one word: the background agent finds a phrase you wrote that one word says better, or nothing when the prompt is already precise.
+- **Daily word limits.** Settings on either device controls how many new words the hook can save each UTC day. Common, advanced and rare words each have a default limit of 5. Set a category to zero to pause it. Once every category is full, the hook skips the background model until the next day.
 - **Never in your way.** The hook returns at once and prints nothing, so your agent never waits and never sees it.
 - **Review, Anki-style.** A card shows the word. Show Answer (Space on the Mac) reveals its part of speech, difficulty and definition, your own phrase under *You wrote*, and the rewrite with the word in pink under *Precisely*. Rate it Again, Hard, Good or Easy (1 to 4 on the Mac), and it comes back when it is due.
 - **Words.** Every word with its definition and difficulty, a pink dot on each new one until you open it. Filter by difficulty, sort by newest or A–Z, and search words and meanings.
@@ -53,7 +54,7 @@ prompt ──▶ UserPromptSubmit hook ──▶ precise-en suggest (detached)
 
 - **Hook.** `precise-en hook` returns at once. Prompts under 50 words are skipped. Longer ones go to `precise-en suggest`, which runs the background agent you chose in [tmux-agent-plane](https://github.com/zazencodes/tmux-agent-plane) (`o` → Configure), checks its answer (including a valid `difficulty`) and saves the word. It refuses a word already in the prompt, a phrase you didn't write, and any word you have already saved, including words you archived as known.
 - **Worker.** One D1 table holds every word, its difficulty and its review state, including archived words so they are never suggested again. The Worker requires a bearer token, schedules reviews, and archives or restores words.
-- **Apps.** The Mac app lives in the menu bar: its book icon fills in while there are new words, it opens at login and opens one window with Review, Words and Stats. The iPhone app has the same three screens.
+- **Apps.** The Mac app lives in the menu bar: its book icon fills in while there are new words, it opens at login and opens one window with Review, Words, Stats and Settings. The iPhone app has the same four screens.
 
 **What leaves your Mac.** Prompts of 50 words or more (up to 20,000 characters) go to the background agent's model, through that CLI's own login. Each saved word keeps your phrase, a quote from your prompt, and the rewrite, in your own D1 database. The apps have your Worker's URL and token built in, so keep your builds to yourself.
 
@@ -137,7 +138,7 @@ Now write a long prompt. Within a minute or so, the book in the menu bar fills i
 
 ## Troubleshooting
 
-- `~/.local/state/precise-en/capture.log` has one line per long prompt: `added`, `no-word`, `duplicate`, `rejected` (with why) or `failed` (with the error). When the latest is `failed`, the menu bar icon turns into a warning, with the error and the log one click away.
+- `~/.local/state/precise-en/capture.log` has one line per long prompt: `added`, `no-word`, `duplicate`, `rejected` (with why), `daily-limit`, or `failed` (with the error). When the latest is `failed`, the menu bar icon turns into a warning, with the error and the log one click away.
 - Test a capture by hand: `echo "<a long prompt>" | precise-en suggest`. It saves a real word.
 - `apps/configure.sh` says which key `config.json` is missing. It runs as part of every build.
 - A menu bar manager such as Ice may hide the menu bar icon when it first appears.
@@ -155,7 +156,7 @@ Set `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` if `xcode-select`
 |---|---|
 | `worker/` | The Cloudflare Worker: the API, the review schedule (`src/schedule.ts`) and the D1 table (`migrations/`) |
 | `Sources/PreciseKit` | The word model, the API client and the capture status, shared by everything below |
-| `Sources/PreciseUI` | SwiftUI shared by both apps: Review, Words and Stats |
+| `Sources/PreciseUI` | SwiftUI shared by both apps: Review, Words, Stats and Settings |
 | `Sources/PreciseCLI` | `precise-en hook` and `precise-en suggest`; `Capture.swift` holds the prompt to the background agent and the checks on its answer |
 | `apps/` | The Mac and iPhone apps (`project.yml`, for xcodegen) and the icon |
 
@@ -169,6 +170,7 @@ The decisions behind precise//en, and what was ruled out, are in [docs/adr](docs
 - [Known words are archived rather than deleted, and judged for difficulty at capture](docs/adr/2026-11-15-known-words-are-archived-and-judged-at-capture.md)
 - [The Mac app's file name spells "precise//en" with colons](docs/adr/2026-11-16-the-mac-app-file-name-spells-the-name-with-colons.md)
 - [Each person's own settings stay out of the repo](docs/adr/2026-11-16-each-persons-own-settings-stay-out-of-the-repo.md)
+- [Daily capture limits are shared by difficulty](docs/adr/2026-11-17-daily-capture-limits-are-shared-by-difficulty.md)
 
 ## Changelog
 

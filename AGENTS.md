@@ -6,7 +6,7 @@ precise//en: learn the English words you could have used in your own prompts. A 
 
 - `worker/`: the Cloudflare Worker and its D1 database `precise-en`. `src/schedule.ts` is the review schedule, `migrations/` the table.
 - `Sources/PreciseKit`: the word model, the API client and the capture status file, shared by everything below.
-- `Sources/PreciseUI`: SwiftUI shared by both apps: `WordStore`, Review, Words, Stats.
+- `Sources/PreciseUI`: SwiftUI shared by both apps: `WordStore`, Review, Words, Stats and Settings.
 - `Sources/PreciseCLI`: `precise-en hook` (the UserPromptSubmit hook) and `precise-en suggest` (asks the background agent and saves the word). `Capture.swift` holds the prompt to the background agent and the checks on its answer.
 - `apps/`: `project.yml` (xcodegen) with the Mac app (`Mac/`, a `MenuBarExtra` plus one window) and the iPhone app (`iOS/`), and `icon.swift`, which renders the app icon.
 
@@ -40,6 +40,7 @@ Read these before changing the area they cover, and write a new one whenever a d
 - Known words are archived rather than deleted, and difficulty is judged at capture: `docs/adr/2026-11-15-known-words-are-archived-and-judged-at-capture.md`
 - The Mac app's file name is `precise::en.app`, which Finder shows as precise//en: `docs/adr/2026-11-16-the-mac-app-file-name-spells-the-name-with-colons.md`
 - Each person's URL, token, Apple team and bundle ID live in their own config file, and Wrangler finds the D1 database by name: `docs/adr/2026-11-16-each-persons-own-settings-stay-out-of-the-repo.md`
+- Daily capture limits are shared by difficulty: `docs/adr/2026-11-17-daily-capture-limits-are-shared-by-difficulty.md`
 
 ## Changelog and Releases
 

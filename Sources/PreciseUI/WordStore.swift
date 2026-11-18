@@ -15,7 +15,7 @@ public final class WordStore {
     /// When `due` was last worked out; moves on with every request.
     public private(set) var now = Date()
 
-    private let api: PreciseAPI
+    let api: PreciseAPI
 
     public init(api: PreciseAPI) {
         self.api = api

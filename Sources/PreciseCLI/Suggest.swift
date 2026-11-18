@@ -24,8 +24,12 @@ enum Suggest {
 
     static func capture(_ prompt: String) async throws -> CaptureStatus {
         let api = PreciseAPI(config: try loadConfig())
+        let available = try await api.captureLimits().filter(\.hasRoom).map(\.difficulty)
+        guard !available.isEmpty else {
+            return CaptureStatus(at: Date(), outcome: .dailyLimit)
+        }
         let saved = try await api.words().map(\.word)
-        let output = try BackgroundAgent.ask(Capture.agentPrompt(for: prompt, saved: saved))
+        let output = try BackgroundAgent.ask(Capture.agentPrompt(for: prompt, saved: saved, available: available))
         guard case .word(let word) = try Capture.parse(output) else {
             return CaptureStatus(at: Date(), outcome: .noWord)
         }
@@ -35,8 +39,13 @@ enum Suggest {
         if let reason = Capture.rejection(of: word, prompt: prompt) {
             return CaptureStatus(at: Date(), outcome: .rejected, word: word.word, detail: reason)
         }
+        guard available.contains(word.difficulty) else {
+            return CaptureStatus(at: Date(), outcome: .dailyLimit, detail: word.difficulty.rawValue)
+        }
         do {
             _ = try await api.add(word)
+        } catch let error as APIError where error.status == 429 {
+            return CaptureStatus(at: Date(), outcome: .dailyLimit, detail: word.difficulty.rawValue)
         } catch let error as APIError where error.status == 409 {
             return CaptureStatus(at: Date(), outcome: .duplicate, word: word.word)
         }

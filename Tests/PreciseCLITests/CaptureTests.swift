@@ -24,14 +24,15 @@ let word = NewWord(
 }
 
 @Test func theAgentPromptCarriesThePromptAndSavedWords() {
-    let text = Capture.agentPrompt(for: prompt, saved: ["terse", "canonical"])
+    let text = Capture.agentPrompt(for: prompt, saved: ["terse", "canonical"], available: [.rare])
     #expect(text.contains("Their saved words: canonical, terse"))
+    #expect(text.contains("Available difficulties today: rare."))
     #expect(text.contains("already know and archived"))
     #expect(text.contains("common"))
     #expect(text.contains("advanced"))
     #expect(text.contains("rare"))
     #expect(text.contains("<prompt>\n\(prompt)\n</prompt>"))
-    #expect(Capture.agentPrompt(for: prompt, saved: []).contains("Their saved words: none yet"))
+    #expect(Capture.agentPrompt(for: prompt, saved: [], available: Difficulty.allCases).contains("Their saved words: none yet"))
 }
 
 @Test func parsesAWordOrNone() throws {

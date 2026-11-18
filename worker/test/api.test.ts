@@ -1,8 +1,11 @@
-import { exports } from "cloudflare:workers";
-import { describe, expect, it } from "vitest";
+import { env, exports } from "cloudflare:workers";
+import { beforeEach, describe, expect, it } from "vitest";
 
 const auth = { Authorization: "Bearer test-token" };
-// Storage lasts the whole file, so each test saves a word of its own.
+// Each test starts with all daily limits available.
+beforeEach(async () => {
+  await env.DB.prepare("DELETE FROM words").run();
+});
 const entry = (word: string, difficulty = "advanced") => ({
   word,
   part_of_speech: "adjective",
@@ -44,6 +47,40 @@ describe("API", () => {
     const duplicate = await post("/words", { ...entry("terse"), definition: "Another definition." });
     expect(duplicate.status).toBe(409);
     expect(await duplicate.json()).toEqual({ error: "terse is already saved" });
+  });
+
+  it("enforces independent daily limits even for simultaneous captures and archived words", async () => {
+    const limits = async () => (await (await call("/capture-limits")).json() as {
+      limits: { difficulty: string; daily_limit: number; captured_today: number }[];
+    }).limits;
+    const setCommon = (value: unknown) => call("/capture-limits/common", {
+      method: "PUT", body: JSON.stringify({ daily_limit: value }),
+    });
+    expect(await limits()).toEqual(expect.arrayContaining([
+      { difficulty: "common", daily_limit: 5, captured_today: 0 },
+      { difficulty: "advanced", daily_limit: 5, captured_today: 0 },
+      { difficulty: "rare", daily_limit: 5, captured_today: 0 },
+    ]));
+    for (const value of [-1, 100, 1.5, "2", null]) {
+      expect((await setCommon(value)).status).toBe(400);
+    }
+    expect((await setCommon(1)).status).toBe(204);
+    const captures = await Promise.all(["brief", "plain"].map(w => post("/words", entry(w, "common"))));
+    expect(captures.map(r => r.status).sort()).toEqual([201, 429]);
+    const { word } = await captures.find(r => r.status === 201)!.json() as { word: { id: number } };
+    expect((await post(`/words/${word.id}/archive`, {})).status).toBe(200);
+    expect((await post("/words", entry("short", "common"))).status).toBe(429);
+    expect((await post("/words", entry("pithy"))).status).toBe(201);
+    expect((await setCommon(2)).status).toBe(204);
+    expect((await post("/words", entry("short", "common"))).status).toBe(201);
+    expect((await limits()).find(row => row.difficulty === "common")?.captured_today).toBe(2);
+
+    await env.DB.prepare("UPDATE words SET created_at = strftime('%Y-%m-%dT23:59:59Z','now','-1 day')").run();
+    expect((await limits()).find(row => row.difficulty === "common")?.captured_today).toBe(0);
+    expect((await setCommon(0)).status).toBe(204);
+    expect((await post("/words", entry("crisp", "common"))).status).toBe(429);
+    expect((await setCommon(5)).status).toBe(204);
+    expect((await post("/words", entry("crisp", "common"))).status).toBe(201);
   });
 
   it("refuses anything but one lowercase word and valid fields", async () => {

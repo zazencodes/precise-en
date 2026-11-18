@@ -13,6 +13,7 @@ public struct CaptureStatus: Codable, Equatable, Sendable {
         case duplicate
         /// The background agent's word broke a rule (it was already in the prompt, say).
         case rejected
+        case dailyLimit = "daily-limit"
         /// Something is broken: the background agent, the API or the config.
         case failed
     }

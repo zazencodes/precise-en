@@ -2,11 +2,10 @@ import PreciseKit
 import SwiftUI
 
 public enum AppTab: Hashable, Sendable {
-    case review, words, stats
+    case review, words, stats, settings
 }
 
-/// The whole app on both platforms: Review, Words and Stats. Each screen keeps the last request's
-/// failure in a bar along its bottom until a request succeeds.
+/// Shared navigation for the Mac and iPhone apps.
 public struct MainView: View {
     @Binding private var tab: AppTab
 
@@ -28,6 +27,9 @@ public struct MainView: View {
                 .failureBar()
                 .tabItem { Label("Stats", systemImage: "chart.bar") }
                 .tag(AppTab.stats)
+            SettingsView()
+                .tabItem { Label("Settings", systemImage: "gearshape") }
+                .tag(AppTab.settings)
         }
         .tint(.white)
         .preferredColorScheme(.dark)

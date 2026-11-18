@@ -4,6 +4,10 @@ All notable changes to precise//en are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+### Added
+
+- Added shared daily capture limits in Settings on Mac and iPhone, with a default of five new words per difficulty.
+
 ## [0.1.0] - 2026-11-16
 
 ### Added

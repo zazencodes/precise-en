@@ -18,6 +18,14 @@ public struct APIError: LocalizedError, Sendable {
     public var errorDescription: String? { "precise-en API \(status): \(message)" }
 }
 
+public struct CaptureLimit: Decodable, Sendable {
+    public let difficulty: Difficulty
+    public let dailyLimit: Int
+    public let capturedToday: Int
+
+    public var hasRoom: Bool { capturedToday < dailyLimit }
+}
+
 /// The precise-en Worker: the word list in D1 that every app and the capture hook share.
 public struct PreciseAPI: Sendable {
     public let config: APIConfig
@@ -31,7 +39,18 @@ public struct PreciseAPI: Sendable {
         return try await send("GET", "words", as: Body.self).words
     }
 
-    /// Throws an `APIError` with status 409 when the word is already saved.
+    public func captureLimits() async throws -> [CaptureLimit] {
+        struct Body: Decodable { let limits: [CaptureLimit] }
+        return try await send("GET", "capture-limits", as: Body.self).limits
+    }
+
+    public func setLimit(_ limit: Int, for difficulty: Difficulty) async throws {
+        struct Body: Encodable { let dailyLimit: Int }
+        let data = try JSONCoding.encoder.encode(Body(dailyLimit: limit))
+        _ = try await request("PUT", "capture-limits/\(difficulty.rawValue)", body: data)
+    }
+
+    /// Throws 409 for a duplicate or 429 when this difficulty has reached its daily limit.
     public func add(_ word: NewWord) async throws -> Word {
         try await send("POST", "words", body: word, as: WordBody.self).word
     }
