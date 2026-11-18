@@ -23,7 +23,7 @@ When you send Claude Code or Codex a long prompt, precise//en asks a cheap backg
 ### Mac
 
 <p align="center">
-  <img src="docs/assets/screenshots/mac.png" alt="The Mac app's Review window twice: a card showing one word set large above Show Answer, then the same card answered, with the definition, the phrase you wrote, the rewrite that uses the word, Archive and the four ratings" width="100%">
+  <img src="docs/assets/screenshots/mac.png" alt="The Mac app's Review window twice: a card showing one word set large above Show Answer, then the same card answered, with the definition, the phrase you wrote, the rewrite that uses the word, Archive, Again and Good" width="100%">
 </p>
 
 ### iPhone
@@ -37,7 +37,7 @@ When you send Claude Code or Codex a long prompt, precise//en asks a cheap backg
 - **Words from your own writing.** Every prompt of 50 words or more is a chance to learn one word: the background agent finds a phrase you wrote that one word says better, or nothing when the prompt is already precise.
 - **Daily word limits.** Settings on either device controls how many new words the hook can save each UTC day. Common, advanced and rare words each have a default limit of 5. Set a category to zero to pause it. Once every category is full, the hook skips the background model until the next day.
 - **Never in your way.** The hook returns at once and prints nothing, so your agent never waits and never sees it.
-- **Review, Anki-style.** A card shows the word. Show Answer (Space on the Mac) reveals its part of speech, difficulty and definition, your own phrase under *You wrote*, and the rewrite with the word in pink under *Precisely*. Rate it Again, Hard, Good or Easy (1 to 4 on the Mac), and it comes back when it is due.
+- **Review, Anki-style.** A card shows the word. Show Answer (Space on the Mac) reveals its part of speech, difficulty and definition, your own phrase under *You wrote*, and the rewrite with the word in pink under *Precisely*. Grade it pass/fail, as Japanese learners use Anki: Again if you didn't recall it (1 on the Mac), Good if you did (Space), and it comes back when it is due.
 - **Words.** Every word with its definition and difficulty, a pink dot on each new one until you open it. Filter by difficulty, sort by newest or A–Z, and search words and meanings.
 - **Archive what you know.** Swipe a word away in Words, or archive it from its revealed card in Review, and it leaves review for good. It stays in your list, so it is never suggested again; Show Archived Words brings it back.
 - **Stats.** Words saved, due, learned and known in one sentence, and every word drawn as a tick by tier, by difficulty and by the week you saved it.

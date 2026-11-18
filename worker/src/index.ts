@@ -18,7 +18,6 @@ interface WordRow {
   seen_at: string | null;
   due_at: string;
   interval_days: number;
-  ease: number;
   reps: number;
   lapses: number;
   reviewed_at: string | null;
@@ -122,8 +121,8 @@ async function addWord(request: Request, env: Env): Promise<Response> {
   }
   const row = await env.DB.prepare(
     `INSERT INTO words (word, part_of_speech, difficulty, definition, phrase, rewrite, created_at, due_at,
-       interval_days, ease, reps, lapses)
-     SELECT ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%SZ','now'), strftime('%Y-%m-%dT%H:%M:%SZ','now'), ?, ?, ?, ?
+       interval_days, reps, lapses)
+     SELECT ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%SZ','now'), strftime('%Y-%m-%dT%H:%M:%SZ','now'), ?, ?, ?
      FROM daily_capture WHERE difficulty = ? AND captured_today < daily_limit
      ON CONFLICT (word) DO NOTHING
      RETURNING *`,
@@ -136,7 +135,6 @@ async function addWord(request: Request, env: Env): Promise<Response> {
       text(body, "phrase", 400),
       text(body, "rewrite", 600),
       NEW_CARD.interval_days,
-      NEW_CARD.ease,
       NEW_CARD.reps,
       NEW_CARD.lapses,
       difficulty,
@@ -163,11 +161,11 @@ async function reviewWord(id: number, request: Request, env: Env): Promise<Respo
   const now = new Date();
   const next = review(existing, rating as Rating, now);
   const row = await env.DB.prepare(
-    `UPDATE words SET due_at = ?, interval_days = ?, ease = ?, reps = ?, lapses = ?, reviewed_at = ?,
+    `UPDATE words SET due_at = ?, interval_days = ?, reps = ?, lapses = ?, reviewed_at = ?,
        seen_at = COALESCE(seen_at, ?)
      WHERE id = ? RETURNING *`,
   )
-    .bind(timestamp(next.due_at), next.interval_days, next.ease, next.reps, next.lapses, timestamp(now), timestamp(now), id)
+    .bind(timestamp(next.due_at), next.interval_days, next.reps, next.lapses, timestamp(now), timestamp(now), id)
     .first<WordRow>();
   return Response.json({ word: row });
 }

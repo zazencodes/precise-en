@@ -41,6 +41,7 @@ Read these before changing the area they cover, and write a new one whenever a d
 - The Mac app's file name is `precise::en.app`, which Finder shows as precise//en: `docs/adr/2026-11-16-the-mac-app-file-name-spells-the-name-with-colons.md`
 - Each person's URL, token, Apple team and bundle ID live in their own config file, and Wrangler finds the D1 database by name: `docs/adr/2026-11-16-each-persons-own-settings-stay-out-of-the-repo.md`
 - Daily capture limits are shared by difficulty: `docs/adr/2026-11-17-daily-capture-limits-are-shared-by-difficulty.md`
+- Reviews are pass/fail (Again and Good) with one fixed ease for every word: `docs/adr/2026-11-18-reviews-are-pass-fail-with-a-fixed-ease.md`
 
 ## Changelog and Releases
 

@@ -25,7 +25,6 @@ private func makeWord(
         seenAt: nil,
         dueAt: dueAt ?? createdAt,
         intervalDays: intervalDays,
-        ease: 2.5,
         reps: reviewedAt == nil ? 0 : 1,
         lapses: 0,
         reviewedAt: reviewedAt,

@@ -129,27 +129,31 @@ public struct ReviewView: View {
         .keyboardShortcut("a", modifiers: [])
     }
 
+    /// Pass or fail, on Anki's keys: 1 for Again, and Space for Good, so a word you knew is Space twice.
     private func ratings(_ word: Word) -> some View {
         HStack(spacing: 8) {
-            ForEach(Array(Rating.allCases.enumerated()), id: \.element) { index, rating in
-                Button {
-                    rate(word, rating)
-                } label: {
-                    VStack(spacing: 1) {
-                        Text(rating.title)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                        #if os(macOS)
-                        Text("\(index + 1)")
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(Theme.tertiary)
-                        #endif
-                    }
-                }
-                .buttonStyle(.secondaryAction)
-                .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: [])
+            ratingButton(word, .again, key: "1", hint: "1")
+            ratingButton(word, .good, key: .space, hint: "space")
+        }
+    }
+
+    private func ratingButton(_ word: Word, _ rating: Rating, key: KeyEquivalent, hint: String) -> some View {
+        Button {
+            rate(word, rating)
+        } label: {
+            VStack(spacing: 1) {
+                Text(rating.title)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                #if os(macOS)
+                Text(hint)
+                    .font(.caption.monospaced())
+                    .foregroundStyle(Theme.tertiary)
+                #endif
             }
         }
+        .buttonStyle(.secondaryAction)
+        .keyboardShortcut(key, modifiers: [])
     }
 
     private func rate(_ word: Word, _ rating: Rating) {

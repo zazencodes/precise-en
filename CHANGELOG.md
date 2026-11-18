@@ -8,6 +8,14 @@ All notable changes to precise//en are documented here. The format follows [Keep
 
 - Added shared daily capture limits in Settings on Mac and iPhone, with a default of five new words per difficulty.
 
+### Changed
+
+- Changed Review to two ratings, Again (1 on the Mac) and Good (Space), and stopped Again from slowing how fast a word's intervals grow.
+
+### Removed
+
+- Removed the Hard and Easy ratings.
+
 ## [0.1.0] - 2026-11-16
 
 ### Added

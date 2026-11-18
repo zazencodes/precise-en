@@ -16,7 +16,6 @@ public struct Word: Codable, Identifiable, Hashable, Sendable {
     public let seenAt: Date?
     public let dueAt: Date
     public let intervalDays: Int
-    public let ease: Double
     public let reps: Int
     public let lapses: Int
     public let reviewedAt: Date?
@@ -60,9 +59,9 @@ public enum Tier: String, CaseIterable, Sendable {
     public var title: String { rawValue.capitalized }
 }
 
-/// How well you remembered a word, as in Anki.
+/// Whether you remembered a word: pass/fail grading, as Japanese learners use Anki.
 public enum Rating: String, Codable, CaseIterable, Sendable {
-    case again, hard, good, easy
+    case again, good
 
     public var title: String { rawValue.capitalized }
 }

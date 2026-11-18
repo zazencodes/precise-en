@@ -27,7 +27,6 @@ private func makeWord(
         "created_at": iso.string(from: createdAt),
         "due_at": iso.string(from: dueAt),
         "interval_days": intervalDays,
-        "ease": 2.5,
         "reps": reviewedAt == nil ? 0 : 1,
         "lapses": 0,
     ]

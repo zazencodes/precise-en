@@ -100,7 +100,9 @@ describe("API", () => {
     expect(reviewed).toMatchObject({ reps: 1, interval_days: 1, difficulty: "common" });
     expect(reviewed.seen_at).not.toBeNull();
     expect(reviewed.reviewed_at).not.toBeNull();
-    expect((await post(`/words/${word.id}/review`, { rating: "great" })).status).toBe(400);
+    for (const rating of ["great", "hard", "easy"]) {
+      expect((await post(`/words/${word.id}/review`, { rating })).status).toBe(400);
+    }
   });
 
   it("marks a word seen once and keeps the first time", async () => {
