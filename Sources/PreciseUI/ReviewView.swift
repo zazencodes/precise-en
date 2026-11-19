@@ -80,7 +80,8 @@ public struct ReviewView: View {
                 .padding(.bottom, revealed ? 0 : proxy.size.height * 0.12)
                 .frame(maxWidth: .infinity, minHeight: proxy.size.height, alignment: revealed ? .topLeading : .leading)
             }
-            .scrollIndicators(.hidden)
+            // Never, even with a mouse connected, so no scroll bar flashes as the answer grows in.
+            .scrollIndicators(.never)
             .scrollBounceBehavior(.basedOnSize)
         }
     }

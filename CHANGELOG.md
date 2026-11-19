@@ -4,6 +4,10 @@ All notable changes to precise//en are documented here. The format follows [Keep
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed a scroll bar flickering on the Mac while a card's answer appeared in Review.
+
 ## [0.2.0] - 2026-11-18
 
 ### Added
